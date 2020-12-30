@@ -1,0 +1,37 @@
+See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# server
+**/.idea/
+**/target
+**/target/
+**/**.iml
+**/**.log
+**/dependency-reduced-pom.xml
+
+## Front end
+# testing
+./fyp-frontend/coverage
+
+# production
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+./fyp-frontend/node_modules
+./fyp-frontend/.pnp
+./fyp-frontend/.pnp.js
+
+# production
+./fyp-frontend/build
+
+# misc
+./fyp-frontend/.DS_Store
+./fyp-frontend/.env.local
+./fyp-frontend/.env.development.local
+./fyp-frontend/.env.test.local
+./fyp-frontend/.env.production.local
+./fyp-frontend/npm-debug.log*
+./fyp-frontend/yarn-debug.log*
+./fyp-frontend/yarn-error.log*
+./fyp-frontend/.eslintcache
+
+
