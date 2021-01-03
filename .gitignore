@@ -33,5 +33,4 @@ See https://help.github.com/articles/ignoring-files/ for more about ignoring fil
 **/yarn-debug.log*
 **/yarn-error.log*
 **/.eslintcache
-
-
+**/**.docx

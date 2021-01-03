@@ -56,7 +56,7 @@ public class Server extends AbstractVerticle {
             logger.info("This was the code submitted -> \n{}", prettyRequest);
 
             final String result = new ExerciseRunner().run(rc.getBodyAsJson().getString("code"));
-            rc.response().setChunked(true).write("This is your result === \n" ).end(result);
+            rc.response().setChunked(true).end(result);
         });
 
         httpServer = vertx.createHttpServer();
@@ -89,12 +89,23 @@ class ExerciseRunner {
 
     public String run(String codeContent) {
 
-        return Reflect.compile(
-                NAME,
-                PACKAGE +
-                        codeContent
+        String result;
 
-        ).create().call("runExercise").get();
+        if (codeContent.matches("import (.|\\n)*")) {
+            return "Cheeky, no imports please!";
+        }
+
+        try {
+            result = Reflect.compile(
+                    NAME,
+                            PACKAGE+
+                            codeContent
+
+            ).create().call("print").get();
+        } catch (Exception e) {
+            result = e.getMessage();
+        }
+        return result;
     }
 
     public static void main(String[] args) {
