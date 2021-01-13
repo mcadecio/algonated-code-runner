@@ -1,0 +1,73 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "http://fyp.ddaio.com/json-schema/problem",
+  "title": "The Problem Json",
+  "description": "The json used to describe a problem",
+  "type": "object",
+  "required": [
+  ],
+  "properties": {
+    "name": {
+      "description": "The name of the problem",
+      "type": "string"
+    },
+    "description": {
+      "description": "The description of the problem",
+      "type": "string"
+    },
+    "exercise": {
+      "description": "Configuration for this specific Exercise",
+      "type": "object",
+      "properties": {
+        "className": {
+          "description": "The name of the Class",
+          "type": "string",
+          "examples": [
+            "com.some.class.Square"
+          ]
+        },
+        "packageName": {
+          "description": "The name of the package",
+          "type": "string",
+          "examples": [
+            "com.some.class"
+          ]
+        },
+        "defaultStarterCode": {
+          "description": "The default code to place in the Editor",
+          "type": "string"
+        },
+        "importsAllowed": {
+          "description": "An array containing the imports allowed for this specific problem",
+          "type": "array",
+          "examples": [
+            [
+              "import com.java.allowed\n;",
+              "import com.java.Math\n;",
+              "import com.java.English\n;",
+              "import com.java.*\n;"
+            ]
+          ]
+        },
+        "illegalMethods": {
+          "description": "Methods that should not be allowed to be called",
+          "type": "array",
+          "examples": [
+            "System.exit(*);"
+          ]
+        },
+        "data": {
+          "description": "Data to be used in the problem",
+          "type": "array",
+          "examples": [
+            [1,2,3,4,5]
+          ]
+        },
+        "code": {
+          "description": "The code submitted by the user",
+          "type": "string"
+        }
+      }
+    }
+  }
+}

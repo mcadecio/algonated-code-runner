@@ -2,15 +2,15 @@ import React, {useState} from 'react';
 import Container from 'react-bootstrap/Container';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
-import Alert from 'react-bootstrap/Alert';
 import ValidCredentials from './valid-cred.json';
 import Card from 'react-bootstrap/Card';
+import DangerDismissibleAlert from '../../DangerDismissibleAlert';
 
 const validCredentials = ValidCredentials;
 
 const LoginForm = ({pathname, login}) => {
     const [validated, setValidated] = useState(false);
-    const alertComponent = DangerDismissibleAlert();
+    const alertComponent = DangerDismissibleAlert({innerText: "Wrong credentials entered!"});
 
     const [credentials, setCredentials] = useState({
         email: '',
@@ -96,23 +96,6 @@ const LoginForm = ({pathname, login}) => {
             </Container>
         </Container>
     );
-};
-
-
-const DangerDismissibleAlert = () => {
-    const [show, setShow] = useState(false);
-
-    return {
-        alert: (
-            <>
-                {show && <Alert variant='danger' onClose={() => setShow(false)} dismissible>
-                    Wrong credentials entered!
-                </Alert>}
-            </>
-        ),
-        show,
-        setShow
-    };
 };
 
 export default LoginForm;
