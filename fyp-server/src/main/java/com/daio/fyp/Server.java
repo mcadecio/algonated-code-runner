@@ -37,11 +37,10 @@ public class Server extends AbstractVerticle {
 
         final var router = Router.router(vertx);
 
-//        router.get("/*").handler(StaticHandler.create("build"));
         router.route().handler(BodyHandler.create());
 
         // Cors
-        router.route().handler(CorsHandler.create(".*://fyp-algorithms-frontend.herokuapp.com:.*")
+        router.route().handler(CorsHandler.create("https://fyp-algorithms-frontend.herokuapp.com")
                 .allowedMethod(io.vertx.core.http.HttpMethod.GET)
                 .allowedMethod(io.vertx.core.http.HttpMethod.POST)
                 .allowedMethod(io.vertx.core.http.HttpMethod.OPTIONS)
