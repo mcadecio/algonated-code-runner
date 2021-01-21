@@ -44,7 +44,7 @@ const ExerciseCodingArea = ({exercise, animation}) => {
         };
         console.log({request});
         console.log(process.env);
-        let endpoint = exercise.endpoint;
+        let endpoint = `https://fyp-algorithms-server.herokuapp.com/${exercise.endpoint}`;
 
         if (process.env.NODE_ENV === 'development') {
             console.log(process.env.NODE_ENV);
