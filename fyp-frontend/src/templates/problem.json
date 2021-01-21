@@ -1,0 +1,19 @@
+{
+  "name": "Problem Name",
+  "description": "Problem Description",
+  "exercise": {
+    "className": "Name of the class",
+    "packageName": "",
+    "defaultStarterCode": "Default Starter Codee",
+    "importsAllowed": [
+      "import com.java.allowed\n;"
+    ],
+    "illegalMethods": [
+      "System.exit(*);"
+    ],
+    "data": [
+      1,2,3,4,5
+    ],
+    "code": "public static void "
+  }
+}

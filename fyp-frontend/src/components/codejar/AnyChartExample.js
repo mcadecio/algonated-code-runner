@@ -32,7 +32,7 @@ function App() {
                         'color': 'rgb(97, 205, 187)'
                     }],
                     links: links,
-                    counter: counter + 1
+                    count: counter + 1
                 };
             });
         }, 1000);
@@ -48,7 +48,7 @@ function App() {
                         "source": `${counter - 2}`,
                         "target": `${counter - 1}`
                     }],
-                    counter: counter
+                    count: counter
                 };
             });
         }, 3000);

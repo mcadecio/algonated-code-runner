@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import Button from 'react-bootstrap/Button';
 import AceEditor from 'react-ace';
 import 'ace-builds/src-noconflict/mode-java';
@@ -24,6 +24,7 @@ import 'ace-builds/src-noconflict/ext-statusbar';
 import 'ace-builds/src-noconflict/ext-textarea';
 import 'ace-builds/src-noconflict/ext-themelist';
 import 'ace-builds/src-noconflict/ext-whitespace';
+import MonacoEditor from 'react-monaco-editor';
 
 require('ace-builds/webpack-resolver');
 
@@ -79,4 +80,51 @@ const editorConfig = {
     }
 };
 
+const MyMonacoEditor = () => {
+
+    const [editorValue, setValue] = useState('')
+
+    useEffect(() => {
+        console.log(editorValue);
+    }, [editorValue])
+
+    return (
+        <MonacoEditor
+            width="800"
+            height="600"
+            language="java"
+            theme="vs-light"
+            value={editorValue}
+            options={{
+                selectOnLineNumbers: true,
+                fontFamily: "SourceCodePro, monospace",
+                fontSize: 15,
+                wordWrap: "on",
+                autoSaveNamespace: "hr-cedit-contest:1-challenge:13581",
+                compile_button_text: "Run Code",
+                defaultLanguage: null,
+                dynamicMode: true,
+                enableIntellisense: true,
+                enableLiveAutocomplete: true,
+                enableLiveAutocompleteLinting: false,
+                enableTrackTyping: true,
+                enableVersioning: true,
+                foldCode: true,
+                inReact: true,
+                languages: ["c", "clojure", "cpp", "cpp14", "csharp", "erlang"],
+                showCompileTest:true,
+                showCustomInput:true,
+                showFullScreen:true,
+                showSubmit:true,
+                showUploadCode: true,
+                versionIds: [],
+                versioningRestUrl: "/rest/contests/master/challenges/2d-array/versions"
+            }}
+            onChange={value => setValue(value)}
+        />
+    );
+}
+
 export default ExerciseEditor;
+
+export {MyMonacoEditor};

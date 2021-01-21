@@ -6,8 +6,9 @@ import Row from 'react-bootstrap/Row';
 import Container from 'react-bootstrap/Container';
 import ExerciseEditor from './ExerciseEditor';
 import DangerDismissibleAlert from '../DangerDismissibleAlert';
+import ListGroup from 'react-bootstrap/ListGroup';
 
-export default function ExercisePage({problem}) {
+function ExercisePage({problem}) {
     return (
         <div>
             <ExerciseProblem name={problem.name} description={problem.description}/>
@@ -20,11 +21,17 @@ export default function ExercisePage({problem}) {
 const ExerciseCodingArea = ({exercise, animation}) => {
     const alert = DangerDismissibleAlert({innerText: 'It looks like something went wrong, check the output !'});
 
-    const [{consoleOutput, result, data}, setConsoleOutput] = useState({
+    const [{consoleOutput, result, data, summary}, setConsoleOutput] = useState({
         isSuccess: false,
         consoleOutput: 'There\'s nothing here yet',
-        result: [1, 1, 0],
-        data: exercise.data
+        result: [],
+        data: exercise.data,
+        summary: {
+            fitness: 0,
+            timeRun: '0ms',
+            iterations: 0,
+            efficacy: 'None'
+        }
     });
 
     const sendCodeToServer = (value) => {
@@ -33,7 +40,7 @@ const ExerciseCodingArea = ({exercise, animation}) => {
             code: value
         };
         console.log({request});
-        fetch('http://localhost:3030/exercise/submit/scales', {
+        fetch(`http://localhost:3030${exercise.endpoint}`, {
             method: 'POSt',
             body: JSON.stringify(request),
             headers: {
@@ -52,17 +59,21 @@ const ExerciseCodingArea = ({exercise, animation}) => {
         <>
             <Row>
                 <Col>
-                    <Card>
+                    <ShadowedCard>
                         <Card.Header as={'h5'}>Exercise Coding Area</Card.Header>
                         <Card.Body>
                             <ExerciseEditor submitCallback={sendCodeToServer}
                                             defaultStarterCode={exercise.defaultStarterCode}/>
                         </Card.Body>
-                    </Card>
+                    </ShadowedCard>
                     <br/>
                     <ExerciseConsole alert={alert.alert} consoleOutput={consoleOutput}/>
                 </Col>
-                <Col><VisualiserArea solution={result} weights={data} animation={animation}/></Col>
+                <Col>
+                    <ExerciseSummary summary={summary}/>
+                    <br/>
+                    <VisualiserArea solution={result} weights={data} animation={animation}/>
+                </Col>
             </Row>
             <br/>
         </>
@@ -70,26 +81,48 @@ const ExerciseCodingArea = ({exercise, animation}) => {
 };
 
 const ExerciseConsole = ({consoleOutput, alert}) => (
-    <Card>
+    <ShadowedCard>
         <Card.Header as={'h5'}>Console Output</Card.Header>
         <Card.Body>
             {alert}
             <Card.Text as={'pre'}>{consoleOutput}</Card.Text>
         </Card.Body>
-    </Card>
+    </ShadowedCard>
 );
 
+
+const ExerciseSummary = ({summary}) => (
+    <ShadowedCard>
+        <Card.Header as={'h5'}>Summary</Card.Header>
+        <ListGroup variant={'flush'}>
+            <ListGroup.Item>Fitness: {summary.fitness}</ListGroup.Item>
+            <ListGroup.Item>Time Run: {summary.timeRun}</ListGroup.Item>
+            <ListGroup.Item>Iterations: {summary.iterations}</ListGroup.Item>
+            <ListGroup.Item>Efficacy: {summary.efficacy}</ListGroup.Item>
+        </ListGroup>
+    </ShadowedCard>
+);
+
+const ShadowedCard = ({children}) => {
+    return (
+        <Card className={'shadow-sm'}>
+            {children}
+        </Card>
+    )
+}
 
 const VisualiserArea = ({solution, weights, animation}) => {
 
     return (
-        <Card>
+        <ShadowedCard>
             <Card.Header as={'h5'}>Visualiser Area</Card.Header>
             <Card.Body>
-                <Container style={{background: 'white', border: '1px solid', textAlign: 'center', padding: '10%'}}>
+                <Container style={{background: 'white', border: '1px solid', textAlign: 'center'}}>
                     {animation({solution, weights})}
                 </Container>
             </Card.Body>
-        </Card>
+        </ShadowedCard>
     );
 };
+
+export {ExercisePage, ShadowedCard};

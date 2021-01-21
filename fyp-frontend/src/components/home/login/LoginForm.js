@@ -8,7 +8,7 @@ import DangerDismissibleAlert from '../../DangerDismissibleAlert';
 
 const validCredentials = ValidCredentials;
 
-const LoginForm = ({pathname, login}) => {
+const LoginForm = ({login}) => {
     const [validated, setValidated] = useState(false);
     const alertComponent = DangerDismissibleAlert({innerText: "Wrong credentials entered!"});
 
@@ -54,9 +54,7 @@ const LoginForm = ({pathname, login}) => {
 
 
     return (
-        <Container style={{'border': 'solid 3px'}}>
-            <h3>Login Area</h3>
-            <h4>Coming from {pathname}</h4>
+        <Container>
             <Container style={{'padding': '3%'}}>
                 <Card style={{'padding': '3%'}}>
                     <Form noValidate validated={validated} className={'text-left'}

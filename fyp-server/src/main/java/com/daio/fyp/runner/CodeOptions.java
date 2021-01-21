@@ -1,6 +1,7 @@
 package com.daio.fyp.runner;
 
 import java.util.List;
+import java.util.function.Function;
 
 public class CodeOptions {
 
@@ -10,8 +11,9 @@ public class CodeOptions {
     private int iterations;
     private List<String> importsAllowed;
     private List<String> illegalMethods;
-    private List<Integer> data;
+    private Object data;
     private String code;
+    private Function<?, ?> modifier;
 
     public String getClassName() {
         return className;
@@ -67,7 +69,7 @@ public class CodeOptions {
         return this;
     }
 
-    public List<Integer> getData() {
+    public Object getData() {
         return data;
     }
 
@@ -82,6 +84,15 @@ public class CodeOptions {
 
     public CodeOptions setCode(String code) {
         this.code = code;
+        return this;
+    }
+
+    public Function getModifier() {
+        return modifier;
+    }
+
+    public <K, V> CodeOptions setModifier(Function<K, V> modifier) {
+        this.modifier = modifier;
         return this;
     }
 

@@ -1,14 +1,17 @@
 package com.daio.fyp.runner;
 
+import com.daio.fyp.runner.calculator.Calculator;
 import com.daio.fyp.verifier.IllegalMethodVerifier;
 import com.daio.fyp.verifier.ImportVerifier;
 import com.daio.fyp.verifier.Verifier;
+import com.google.common.base.Stopwatch;
 import org.joor.Reflect;
 import org.joor.ReflectException;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 public class CodeRunner {
 
@@ -18,19 +21,21 @@ public class CodeRunner {
     private boolean isSuccess;
     private Reflect compiledClass;
     private final CodeOptions options;
+    private final CodeRunnerSummary runnerSummary;
 
     public CodeRunner(CodeOptions options) {
         this.options = options;
         this.isSuccess = false;
         this.errorMessage = "It seems compile was never called!";
+        this.runnerSummary = new CodeRunnerSummary();
     }
 
     public boolean compile() {
-        if (verifyError(new ImportVerifier(),"imports:\n" )) {
+        if (verifyError(new ImportVerifier(), "imports:\n")) {
             return false;
         }
 
-        if (verifyError(new IllegalMethodVerifier(options.getIllegalMethods()),"illegal methods:\n" )) {
+        if (verifyError(new IllegalMethodVerifier(options.getIllegalMethods()), "illegal methods:\n")) {
             return false;
         }
 
@@ -52,20 +57,32 @@ public class CodeRunner {
             return Collections.emptyList();
         }
 
-        final List<Double> data = options.getData()
-                .stream()
-                .map(Double::valueOf)
-                .collect(Collectors.toList());
+        Object data = Optional.ofNullable(options.getModifier())
+                .map(function -> function.apply(options.getData()))
+                .orElse(options.getData());
 
         try {
+            Stopwatch timer = Stopwatch.createStarted();
             final List<Integer> valueToReturn = compiledClass.call(options.getMethodToCall(), data, options.getIterations())
                     .get();
+            timer.stop();
+            runnerSummary.setTimeRun(timer.elapsed(TimeUnit.MILLISECONDS));
+            runnerSummary.setIterations(options.getIterations());
             isSuccess = true;
             return valueToReturn;
         } catch (ReflectException reflectException) {
             handleError(reflectException.getMessage());
             return Collections.emptyList();
         }
+    }
+
+    public <T> CodeRunnerSummary getSummary(
+            Calculator<T> fitnessCalculator,
+            Calculator<T> efficiencyCalculator,
+            T data, List<Integer> solution) {
+        runnerSummary.setFitness(fitnessCalculator.calculate(data, solution));
+        runnerSummary.setEfficacy(efficiencyCalculator.calculate(data, solution));
+        return runnerSummary;
     }
 
     public String getErrorMessage() {

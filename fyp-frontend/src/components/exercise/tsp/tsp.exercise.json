@@ -1,0 +1,38 @@
+{
+  "id": "tsp",
+  "name": "The Travelling Salesman Problem",
+  "description": [
+    "The travelling salesman problem (also called the traveling salesperson problem or TSP)",
+    "asks the following question: \"Given a list of cities and the distances between each pair",
+    "of cities, what is the shortest possible route that visits each city exactly once and returns",
+    "to the origin city?\" It is an NP-hard problem in combinatorial optimization, important in theoretical",
+    "computer science and operations research."
+  ],
+  "imgLocation": "https://media.giphy.com/media/fw8uZriJW4TlhmZnUj/giphy.gif",
+  "exercise": {
+    "className": "TSPProblem",
+    "packageName": "com.exercise",
+    "methodToCall": "runTSP",
+    "iterations": 1000,
+    "defaultStarterCode": [
+      "public class TSPProblem {\n",
+      "    public List<Integer> runTSP(double[][] distances, int iterations) {\n",
+      "        return new ArrayList<>();\n",
+      "    }\n",
+      "}"
+    ],
+    "importsAllowed": [
+      "import java.util.List;",
+      "import java.util.Random;",
+      "import java.util.stream.Collectors;",
+      "import java.util.stream.Stream;",
+      "import java.util.Collections;",
+      "import java.util.ArrayList;"
+    ],
+    "illegalMethods": [
+      "System\\.exit\\(.*\\);"
+    ],
+    "code": "",
+    "endpoint": "/exercise/submit/tsp"
+  }
+}

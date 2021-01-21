@@ -18,7 +18,7 @@ export default function LoginPage() {
     return (
         <div>
             <p>You must log in to view the page at {from.pathname}</p>
-            <LoginForm pathname={from.pathname} login={login}/>
+            <LoginForm login={login}/>
         </div>
     );
 }

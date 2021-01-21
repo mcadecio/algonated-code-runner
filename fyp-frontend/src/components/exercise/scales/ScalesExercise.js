@@ -3,7 +3,9 @@ import {primes} from './scales.primes.json';
 import defaultConfig from './scales.exercise.json';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-const maxWidth = 651;
+import {ExercisePage} from '../ExercisePage';
+const maxWidth = 778;
+
 const ScalesExercise = () => {
 
     const exerciseConfig = {
@@ -12,10 +14,12 @@ const ScalesExercise = () => {
 
     exerciseConfig.exercise.data = primes;
 
-    return {
-        animation: Scale,
-        ...exerciseConfig
-    };
+    return (
+        <ExercisePage problem={{
+            animation: Scale,
+            ...exerciseConfig
+        }}/>
+    )
 };
 
 const Scale = ({solution, weights}) => {
@@ -39,12 +43,11 @@ const Scale = ({solution, weights}) => {
 
 const WidthCalculator = ({solution, weights}) => {
 
-
     const [{
         leftRectangleWidth, rightRectangleWidth
     }, setWidth] = useState({
-        leftRectangleWidth: 409,
-        rightRectangleWidth: 409
+        leftRectangleWidth: maxWidth / 2,
+        rightRectangleWidth: maxWidth / 2
     });
 
     const [inputWidth, updateWidth] = useState(50.0);
@@ -77,7 +80,7 @@ const WidthCalculator = ({solution, weights}) => {
 
     useEffect(() => {
         setTimeout(async () => {
-            updateWidth(50); //resetting
+            updateWidth(50);
             const totalWeight = weights.reduce((weight, anotherWeight) => weight + anotherWeight);
             const delay = ms => new Promise(res => setTimeout(res, ms));
 
@@ -90,7 +93,7 @@ const WidthCalculator = ({solution, weights}) => {
                 } else {
                     decrementWidth(percentage);
                 }
-                await delay(50);
+                await delay(500);
             }
 
         }, 500);
