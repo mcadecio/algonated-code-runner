@@ -93,7 +93,7 @@ const WidthCalculator = ({solution, weights}) => {
                 } else {
                     decrementWidth(percentage);
                 }
-                await delay(500);
+                await delay(50);
             }
 
         }, 500);

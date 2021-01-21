@@ -7,6 +7,7 @@ import Container from 'react-bootstrap/Container';
 import ExerciseEditor from './ExerciseEditor';
 import DangerDismissibleAlert from '../DangerDismissibleAlert';
 import ListGroup from 'react-bootstrap/ListGroup';
+import Button from 'react-bootstrap/Button';
 
 function ExercisePage({problem}) {
     return (
@@ -20,6 +21,8 @@ function ExercisePage({problem}) {
 
 const ExerciseCodingArea = ({exercise, animation}) => {
     const alert = DangerDismissibleAlert({innerText: 'It looks like something went wrong, check the output !'});
+
+    const [code, setCode] = useState(exercise.defaultStarterCode.join(' '));
 
     const [{consoleOutput, result, data, summary}, setConsoleOutput] = useState({
         isSuccess: false,
@@ -40,8 +43,15 @@ const ExerciseCodingArea = ({exercise, animation}) => {
             code: value
         };
         console.log({request});
-        fetch(`http://localhost:3030${exercise.endpoint}`, {
-            method: 'POSt',
+        console.log(process.env);
+        let endpoint = exercise.endpoint;
+
+        if (process.env.NODE_ENV === 'development') {
+            console.log(process.env.NODE_ENV);
+            endpoint = `http://localhost:80${exercise.endpoint}`;
+        }
+        fetch(endpoint, {
+            method: 'POST',
             body: JSON.stringify(request),
             headers: {
                 'Content-Type': 'application/json'
@@ -61,11 +71,20 @@ const ExerciseCodingArea = ({exercise, animation}) => {
                 <Col>
                     <ShadowedCard>
                         <Card.Header as={'h5'}>Exercise Coding Area</Card.Header>
-                        <Card.Body>
-                            <ExerciseEditor submitCallback={sendCodeToServer}
-                                            defaultStarterCode={exercise.defaultStarterCode}/>
-                        </Card.Body>
+                        <ExerciseEditor code={code} setCode={setCode}/>
                     </ShadowedCard>
+                    <div className={'float-right'}>
+                        <Button
+                            type='button'
+                            className={'btn-dark-blue'}
+                            variant={'primary'}
+                            onClick={() => {
+                                console.log({code});
+                                sendCodeToServer(code);
+                            }}
+                        >Submit Code</Button>
+                    </div>
+                    <br/>
                     <br/>
                     <ExerciseConsole alert={alert.alert} consoleOutput={consoleOutput}/>
                 </Col>
@@ -105,11 +124,11 @@ const ExerciseSummary = ({summary}) => (
 
 const ShadowedCard = ({children}) => {
     return (
-        <Card className={'shadow-sm'}>
+        <Card className={'shadow-sm'} style={{marginBottom: '1%'}}>
             {children}
         </Card>
-    )
-}
+    );
+};
 
 const VisualiserArea = ({solution, weights, animation}) => {
 

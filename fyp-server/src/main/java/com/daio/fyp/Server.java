@@ -17,6 +17,7 @@ import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.BodyHandler;
 import io.vertx.ext.web.handler.CorsHandler;
+import io.vertx.ext.web.handler.StaticHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,6 +37,7 @@ public class Server extends AbstractVerticle {
 
         final var router = Router.router(vertx);
 
+//        router.get("/*").handler(StaticHandler.create("build"));
         router.route().handler(BodyHandler.create());
 
         // Cors
@@ -80,10 +82,16 @@ public class Server extends AbstractVerticle {
         httpServer = vertx.createHttpServer();
         httpServer
                 .requestHandler(router)
-                .listen(3030, "0.0.0.0", result -> {
+                .listen(getPort(), "0.0.0.0", result -> {
                     logger.info("HTTP Server Started ...");
                     startPromise.complete();
                 });
+    }
+
+    private int getPort() {
+        String port = System.getProperty("heroku.port", "80");
+        logger.info(port);
+        return Integer.parseInt(port);
     }
 
     private void handleTSPRequest(RoutingContext rc) {

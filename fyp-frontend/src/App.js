@@ -17,14 +17,16 @@ function App() {
     return (
         <AuthProvider>
             <Router>
+                <div style={{marginBottom: '5%'}}>
                     <Navbar variant={'dark'} expand="lg" style={{backgroundColor: '#00325b'}} fixed={'top'}>
-                    <Navbar.Brand>Algorithms</Navbar.Brand>
-                    <Nav className="mr-auto">
-                        <Nav.Link as={Link} to={'/exercises'}>Exercises</Nav.Link>
-                    </Nav>
-                    <AuthNav/>
-                </Navbar>
-                <div style={{margin: '3%', marginTop: '5%'}}>
+                        <Navbar.Brand>Algorithms</Navbar.Brand>
+                        <Nav className="mr-auto">
+                            <Nav.Link as={Link} to={'/exercises'}>Exercises</Nav.Link>
+                        </Nav>
+                        <AuthNav/>
+                    </Navbar>
+                </div>
+                <div style={{margin: '3%'}}>
 
                     <Switch>
                         <Route exact path={'/'}>

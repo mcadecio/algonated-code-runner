@@ -58,7 +58,8 @@ const ExerciseCard = ({imgLocation, title, text, id}) => {
             <Card.Footer>
                 <Container className={'d-flex justify-content-center'}>
                     <Button
-                        variant={'secondary'}
+                        variant={'primary'}
+                        className={'btn-dark-blue'}
                         as={Link} to={`/exercises/${id}`}>
                         Try it!
                     </Button>
@@ -79,7 +80,6 @@ const HoverableCard = ({children}) => {
             maxWidth: '321px',
             transition: '0.3s',
             marginBottom: '1%',
-            marginTop: '2%'
         };
 
         const hoveredCardStyle = {
@@ -88,7 +88,6 @@ const HoverableCard = ({children}) => {
             boxShadow: '0 8px 16px 0 rgba(0, 0, 0, 0.2)',
             transition: '0.3s',
             marginBottom: '1%',
-            marginTop: '2%'
         };
         if (hovered === true) {
             setCardStyle(hoveredCardStyle);

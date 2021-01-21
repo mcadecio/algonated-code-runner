@@ -104,7 +104,7 @@
                                         implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <manifestEntries>
                                         <Main-Class>io.vertx.core.Launcher</Main-Class>
-                                        <Main-Verticle>com.ddaio.${project.artifactId}.Server</Main-Verticle>
+                                        <Main-Verticle>com.daio.fyp.Server</Main-Verticle>
                                     </manifestEntries>
                                 </transformer>
                             </transformers>
@@ -120,7 +120,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>com.ddaio.${project.artifactId}.Server</mainClass>
+                            <mainClass>com.daio.fyp.Server</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>

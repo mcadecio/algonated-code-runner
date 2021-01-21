@@ -36,3 +36,18 @@
     transform: rotate(360deg);
   }
 }
+
+.btn-dark-blue {
+  background-color: rgb(0, 50, 91);
+  border-color: rgb(0, 50, 91);
+}
+
+.btn-dark-blue:hover {
+  background-color: #007bff;
+  border-color: #007bff;
+}
+
+.dark-blue {
+  background-color: rgb(0, 50, 91);
+  color: white;
+}

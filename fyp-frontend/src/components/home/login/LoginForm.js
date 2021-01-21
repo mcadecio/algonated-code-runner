@@ -86,7 +86,7 @@ const LoginForm = ({login}) => {
                             </Form.Control.Feedback>
                         </Form.Group>
 
-                        <Button variant='light' type={'submit'}>
+                        <Button variant='primary' className={'btn-dark-blue'} type={'submit'}>
                             Submit
                         </Button>
                     </Form>
