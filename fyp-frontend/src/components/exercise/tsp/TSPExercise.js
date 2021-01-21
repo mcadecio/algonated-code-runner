@@ -156,7 +156,7 @@ const Nodes = () => {
     const [nodes, setNodes] = useState([]);
     const counter = Counter();
 
-    const addNode = (id, color) => {
+    const addNode = (id, color ) => {
         counter.increment();
         setNodes(oldNodes => {
             if (id > oldNodes.length + 1) {
