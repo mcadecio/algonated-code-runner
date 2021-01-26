@@ -4,6 +4,7 @@ import defaultConfig from './scales.exercise.json';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import {ExercisePage} from '../ExercisePage';
+import {SeekScaleAnimation} from '../../Animations';
 const maxWidth = 778;
 
 const ScalesExercise = () => {
@@ -16,7 +17,7 @@ const ScalesExercise = () => {
 
     return (
         <ExercisePage problem={{
-            animation: Scale,
+            animation: ScaleWithSVGScale,
             ...exerciseConfig
         }}/>
     )
@@ -40,6 +41,50 @@ const Scale = ({solution, weights}) => {
         </>
     );
 };
+
+const ScaleWithSVGScale = ({solution, weights}) => {
+    const inputWidth = SimpleWidthCalculator({solution, weights});
+
+    return (
+        <>
+            <SeekScaleAnimation inputWidth={inputWidth}/>
+        </>
+    );
+}
+
+const SimpleWidthCalculator = ({solution, weights}) => {
+    const randomStart = Math.floor(Math.random() * Math.floor(1000));
+    const [inputWidth, updateWidth] = useState( {
+        left: randomStart,
+        right: Math.abs(randomStart - 1000)
+    });
+
+
+    useEffect(() => {
+        let sumOfWeightsOnTheLeft = 0;
+        let sumOfWeightsOnTheRight = 0;
+
+        for (let i = 0; i < solution.length; i++) {
+            if (solution[i] === 0) {
+                sumOfWeightsOnTheLeft = sumOfWeightsOnTheLeft + weights[i];
+            } else {
+                sumOfWeightsOnTheRight = sumOfWeightsOnTheRight + weights[i];
+            }
+        }
+
+        console.debug({sumOfWeightsOnTheLeft});
+        console.debug({sumOfWeightsOnTheRight});
+
+        if (sumOfWeightsOnTheRight !== 0 || sumOfWeightsOnTheLeft !== 0)
+            updateWidth({
+                left: sumOfWeightsOnTheLeft,
+                right: sumOfWeightsOnTheRight
+            });
+
+    }, [solution, weights])
+
+    return inputWidth;
+}
 
 const WidthCalculator = ({solution, weights}) => {
 
@@ -101,7 +146,8 @@ const WidthCalculator = ({solution, weights}) => {
 
     return {
         leftRectangleWidth,
-        rightRectangleWidth
+        rightRectangleWidth,
+        inputWidth
     };
 };
 

@@ -6,7 +6,9 @@ import Row from 'react-bootstrap/Row';
 import Button from 'react-bootstrap/Button';
 import * as d3 from 'd3';
 import data from './data.json';
-import {MyMonacoEditor} from './exercise/ExerciseEditor';
+import '../App.css';
+import SVGScale from './exercise/scales/SVGScale';
+import './anime.css';
 
 
 const CirclesAcross = () => (
@@ -281,7 +283,7 @@ const ChargedAnimationAnimeJS = () => {
                 try {
                     document.querySelector('.el').innerHTML = JSON.stringify(battery);
                 } catch {
-                    console.log('interrupted');
+                    console.debug('interrupted');
                 }
             }
         });
@@ -387,53 +389,67 @@ const SimpleNetworkGraph = () => {
         height = 400 - margin.top - margin.bottom;
 
     useEffect(() => {
-        d3.select('svg').remove()
-        animationRef.current = d3.select('.myDiv').append("svg")
+        d3.select('svg').remove();
+        animationRef.current = d3.select('.myDiv').append('svg');
 
-        const svg  = animationRef.current
-            .attr("width", width + margin.left + margin.right)
-            .attr("height", height + margin.top + margin.bottom)
-            .append("g")
-            .attr("transform",
-                "translate(" + margin.left + "," + margin.top + ")");
+        const svg = animationRef.current
+            .attr('width', width + margin.left + margin.right)
+            .attr('height', height + margin.top + margin.bottom)
+            .append('g')
+            .attr('transform',
+                'translate(' + margin.left + ',' + margin.top + ')');
 
         // Initialize the links
         const link = svg
-            .selectAll("line")
+            .selectAll('line')
             .data(myData.links)
             .enter()
-            .append("line")
+            .append('line')
             .attr('stroke', 'black');
 
-    // Initialize the nodes
+        // Initialize the nodes
         const node = svg
-            .selectAll("circle")
+            .selectAll('circle')
             .data(myData.nodes)
             .enter()
-            .append("circle")
-            .attr("r", 5)
+            .append('circle')
+            .attr('r', 5);
 
         // Let's list the force we wanna apply on the network
         const simulation = d3.forceSimulation(data.nodes)                 // Force algorithm is applied to data.nodes
-            .force("link", d3.forceLink()                               // This force provides links between nodes
-                .id(function(d) { return d.id; })                     // This provide  the id of a node
+            .force('link', d3.forceLink()                               // This force provides links between nodes
+                .id(function (d) {
+                    return d.id;
+                })                     // This provide  the id of a node
                 .links(data.links)                                    // and this the list of links
             )
-            .force("charge", d3.forceManyBody().strength(-400))         // This adds repulsion between nodes. Play with the -400 for the repulsion strength
-            .force("center", d3.forceCenter(width / 2, height / 2))     // This force attracts nodes to the center of the svg area
-            .on("end", ticked);
+            .force('charge', d3.forceManyBody().strength(-400))         // This adds repulsion between nodes. Play with the -400 for the repulsion strength
+            .force('center', d3.forceCenter(width / 2, height / 2))     // This force attracts nodes to the center of the svg area
+            .on('end', ticked);
 
         // This function is run at each iteration of the force algorithm, updating the nodes position.
         function ticked() {
             link
-                .attr("x1", function(d) { return d.source.x; })
-                .attr("y1", function(d) { return d.source.y; })
-                .attr("x2", function(d) { return d.target.x; })
-                .attr("y2", function(d) { return d.target.y; });
+                .attr('x1', function (d) {
+                    return d.source.x;
+                })
+                .attr('y1', function (d) {
+                    return d.source.y;
+                })
+                .attr('x2', function (d) {
+                    return d.target.x;
+                })
+                .attr('y2', function (d) {
+                    return d.target.y;
+                });
 
             node
-                .attr("cx", function (d) { return d.x; })
-                .attr("cy", function(d) { return d.y; });
+                .attr('cx', function (d) {
+                    return d.x;
+                })
+                .attr('cy', function (d) {
+                    return d.y;
+                });
         }
 
     }, [myData]);
@@ -443,8 +459,8 @@ const SimpleNetworkGraph = () => {
             <Button onClick={() => updateData(old => {
                 return {
                     links: old.links,
-                        nodes: [...old.nodes, {id: "780"}]
-                }
+                    nodes: [...old.nodes, {id: '780'}]
+                };
             })}
                     variant={'light'}>Add node</Button>
             <div className="myDiv"/>
@@ -452,8 +468,220 @@ const SimpleNetworkGraph = () => {
     );
 };
 
+const ScaleAnimationWithSVG = () => {
+
+    const [rotation, setRotation] = useState(0);
+
+    const animationRef = useRef();
+
+    const [counter, setCounter] = useState(0);
+
+    useEffect(() => {
+
+        const duration = 3000;
+
+        animationRef.current = anime({
+            targets: '.el',
+            keyframes: [
+                {rotate: -30},
+                {rotate: 0},
+                {rotate: 30},
+                {rotate: 0}
+            ],
+            duration: duration,
+            loop: true,
+            easing: 'linear'
+        });
+
+        anime({
+            targets: '#basket-and-handles-left',
+            keyframes: [
+                {translateY: 50},
+                {translateY: 0},
+                {translateY: -50},
+                {translateY: 0}
+            ],
+            duration: duration,
+            loop: true,
+            easing: 'linear'
+        });
+
+        anime({
+            targets: '#basket-and-handles-right',
+            keyframes: [
+                {translateY: -50},
+                {translateY: 0},
+                {translateY: 50},
+                {translateY: 0}
+            ],
+            duration: duration,
+            loop: true,
+            easing: 'linear'
+        });
+
+        setInterval(() => {
+            setCounter(old => old + 1);
+        }, 1500);
+
+        //
+        // setStyle({
+        //     transformBox: "fill-box",
+        //     transformOrigin: 'center',
+        //     transform: `rotate(${rotation}deg)`
+        // })
+    }, [rotation]);
+
+    return (
+        <>
+            <Button variant={'light'} onClick={() => setRotation(old => old + 1)}>
+                Up
+            </Button>
+            <Button variant={'light'} onClick={() => setRotation(old => old - 1)}>
+                DOWN
+            </Button>
+            <Button onClick={() => animationRef.current.restart()} variant={'light'}>
+                Restart
+            </Button>
+            <SVGScale
+                topPartId={'el'}
+                leftBasketId={'basket-and-handles-left'}
+                rightBasketId={'basket-and-handles-right'}
+                basketInnerText={{left: counter, right: counter}}/>
+        </>
+
+    );
+};
+
+const SeekScaleAnimation = ({inputWidth, withOptions = false}) => {
+
+    const [value, setValue] = useState('0');
+
+    const animationScale = useRef();
+
+    const animationScaleNegative = useRef();
+
+    useEffect(() => {
+        const elasticity = 200;
+        const duration = 3000;
+        const easing = 'easeInOutSine';
+        const autoplay = false;
+
+        animationScale.current = anime.timeline({
+            targets: '.el',
+            rotate: 30,
+            elasticity,
+            autoplay,
+            easing
+        }).add({
+            targets: '#basket-and-handles-left',
+            translateY: -50
+        }, 0).add({
+            targets: '#basket-and-handles-right',
+            translateY: 50
+        }, 0);
+
+        animationScaleNegative.current = anime.timeline({
+            targets: '.el',
+            rotate: -30,
+            elasticity,
+            autoplay,
+            easing
+        }).add({
+            targets: '#basket-and-handles-left',
+            translateY: 50
+        }, 0).add({
+            targets: '#basket-and-handles-right',
+            translateY: -50
+        }, 0);
+
+    }, []);
+
+    useEffect(() => {
+
+        let width = -1 * (inputWidth.left - inputWidth.right);
+
+        if (width > 0) {
+            animationScale.current.seek(animationScale.current.duration * (width / 1000));
+        } else {
+            animationScaleNegative.current.seek(animationScaleNegative.current.duration * (Math.abs(width) / 1000));
+        }
+        console.debug({width});
+        console.debug({inputWidth});
+    }, [inputWidth]);
+
+    useEffect(() => {
+
+        if (withOptions) {
+            if (value > 0) {
+                animationScale.current.seek(animationScale.current.duration * (`${value}` / 1000));
+            } else {
+                animationScaleNegative.current.seek(animationScaleNegative.current.duration * (Math.abs(value) / 1000));
+            }
+            console.debug({value});
+        }
+    }, [value]);
+
+
+    return (
+        <>
+            {withOptions &&
+            <Row>
+                <Col>
+                    <SVGScale
+                        topPartId={'el'}
+                        leftBasketId={'basket-and-handles-left'}
+                        rightBasketId={'basket-and-handles-right'}
+                        basketInnerText={inputWidth}/>
+                </Col>
+                <Col>
+                    {withOptions && <div className="">
+                        <div className="line controls">
+                            <input className="progress" step=".001" type="range" min="-1000" max="1000" value={value}
+                                   onChange={(event) => {
+                                       setValue(event.target.value);
+                                   }}/>
+                        </div>
+                        <h5>Left: {!withOptions && inputWidth.left} {withOptions && (function () {
+                            let parsedValue = Number.parseInt(value, 10);
+                            if (parsedValue === 0) {
+                                return parsedValue;
+                            } else if (parsedValue > 0) {
+                                return 1000 - parsedValue;
+
+                            } else {
+                                return Math.abs(parsedValue);
+                            }
+                        })()}
+                            | Right: {!withOptions && inputWidth.right} {withOptions && (function () {
+                                let parsedValue = Number.parseInt(value, 10);
+                                if (parsedValue === 0) {
+                                    return parsedValue;
+                                } else if (parsedValue > 0) {
+                                    return Math.abs(parsedValue);
+
+                                } else {
+                                    return parsedValue + 1000;
+                                }
+                            })()}</h5>
+                    </div>}
+                </Col>
+            </Row>}
+
+            {!withOptions && <SVGScale
+                topPartId={'el'}
+                leftBasketId={'basket-and-handles-left'}
+                rightBasketId={'basket-and-handles-right'}
+                basketInnerText={inputWidth}/>}
+        </>
+    );
+};
+
 export default function Animations() {
     return (
-        <MyMonacoEditor/>
+        <>
+            <SeekScaleAnimation inputWidth={{left: '500', right: '500'}} withOptions={true}/>
+        </>
     );
 }
+
+export {SeekScaleAnimation};

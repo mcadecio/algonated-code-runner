@@ -115,7 +115,7 @@ const MyMonacoEditor = () => {
         '}\n');
 
     useEffect(() => {
-        console.log(editorValue);
+        console.debug(editorValue);
     }, [editorValue]);
 
     return (

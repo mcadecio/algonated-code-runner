@@ -1,1 +1,1 @@
-web: java -Dheroku.port=$PORT -jar target/fyp-server-1.0-SNAPSHOT.jar
+web: java -Dheroku.port=$PORT -Dcors.allowed.domain=$CORS_ALLOWED_DOMAIN -jar target/fyp-server-1.0-SNAPSHOT.jar

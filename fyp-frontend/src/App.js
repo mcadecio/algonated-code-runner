@@ -37,9 +37,9 @@ function App() {
                         <Route exact path="/exercises/tspanimation">
                             <TSPAnimation solution={[]} weights={[[]]} test={true}/>
                         </Route>
-                        <PrivateRoute exact path='/exercises' component={ExerciseView}/>
-                        <PrivateRoute exact path="/exercises/scales" component={ScalesExercise}/>
-                        <PrivateRoute exact path="/exercises/tsp" component={TSPExercise}/>
+                        <Route exact path='/exercises' component={ExerciseView}/>
+                        <Route exact path="/exercises/scales" component={ScalesExercise}/>
+                        <Route exact path="/exercises/tsp" component={TSPExercise}/>
                     </Switch>
                 </div>
             </Router>

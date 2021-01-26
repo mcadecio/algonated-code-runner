@@ -40,7 +40,7 @@ public class Server extends AbstractVerticle {
         router.route().handler(BodyHandler.create());
 
         // Cors
-        router.route().handler(CorsHandler.create("https://fyp-algorithms-frontend.herokuapp.com")
+        router.route().handler(CorsHandler.create(getAllowedDomain())
                 .allowedMethod(io.vertx.core.http.HttpMethod.GET)
                 .allowedMethod(io.vertx.core.http.HttpMethod.POST)
                 .allowedMethod(io.vertx.core.http.HttpMethod.OPTIONS)
@@ -91,6 +91,12 @@ public class Server extends AbstractVerticle {
         String port = System.getProperty("heroku.port", "80");
         logger.info(port);
         return Integer.parseInt(port);
+    }
+
+    private String getAllowedDomain() {
+        String allowedDomain = System.getProperty("cors.allowed.domain", ".*://localhost:.*");
+        logger.info(allowedDomain);
+        return allowedDomain;
     }
 
     private void handleTSPRequest(RoutingContext rc) {

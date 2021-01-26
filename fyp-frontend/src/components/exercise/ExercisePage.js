@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import ExerciseProblem from './ExerciseProblem';
 import Card from 'react-bootstrap/Card';
 import Col from 'react-bootstrap/Col';
@@ -8,21 +8,25 @@ import ExerciseEditor from './ExerciseEditor';
 import DangerDismissibleAlert from '../DangerDismissibleAlert';
 import ListGroup from 'react-bootstrap/ListGroup';
 import Button from 'react-bootstrap/Button';
+import Spinner from 'react-bootstrap/Spinner';
+import Nav from 'react-bootstrap/Nav';
 
 function ExercisePage({problem}) {
     return (
-        <div>
+        <div style={{marginLeft: '2%', marginRight: '2%'}}>
             <ExerciseProblem name={problem.name} description={problem.description}/>
             <br/>
-            <ExerciseCodingArea exercise={problem.exercise} animation={problem.animation}/>
+            <TheWholePage exercise={problem.exercise} animation={problem.animation}/>
         </div>
     );
 }
 
-const ExerciseCodingArea = ({exercise, animation}) => {
+const TheWholePage = ({exercise, animation}) => {
     const alert = DangerDismissibleAlert({innerText: 'It looks like something went wrong, check the output !'});
 
     const [code, setCode] = useState(exercise.defaultStarterCode.join(' '));
+
+    const [isLoading, setLoading] = useState(false);
 
     const [{consoleOutput, result, data, summary}, setConsoleOutput] = useState({
         isSuccess: false,
@@ -38,16 +42,16 @@ const ExerciseCodingArea = ({exercise, animation}) => {
     });
 
     const sendCodeToServer = (value) => {
+        setLoading(true);
         const request = {
             ...exercise,
             code: value
         };
-        console.log({request});
-        console.log(process.env);
-        let endpoint = `https://fyp-algorithms-server.herokuapp.com${exercise.endpoint}`;
+        console.debug({request});
+        let endpoint = `${process.env.REACT_APP_FYP_SERVER_DOMAIN}${exercise.endpoint}`;
 
         if (process.env.NODE_ENV === 'development') {
-            console.log(process.env.NODE_ENV);
+            console.debug(process.env.NODE_ENV);
             endpoint = `http://localhost:80${exercise.endpoint}`;
         }
         fetch(endpoint, {
@@ -56,42 +60,37 @@ const ExerciseCodingArea = ({exercise, animation}) => {
             headers: {
                 'Content-Type': 'application/json'
             }
-        })
-            .then(res => res.json())
-            .then(requestResult => {
-                console.log(requestResult);
-                setConsoleOutput(requestResult);
-                alert.setShow(!requestResult.isSuccess);
-            });
+        }).then(res => {
+            return res.json();
+        }).then(requestResult => {
+            console.debug(requestResult);
+            setConsoleOutput(requestResult);
+            alert.setShow(!requestResult.isSuccess);
+        }).finally(() => {
+            setLoading(false);
+        });
     };
 
     return (
         <>
-            <Row>
+            <Row xs={1} sm={1} md={1} lg={1} xl={2}>
                 <Col>
-                    <ShadowedCard>
-                        <Card.Header as={'h5'}>Exercise Coding Area</Card.Header>
-                        <ExerciseEditor code={code} setCode={setCode}/>
-                    </ShadowedCard>
-                    <div className={'float-right'}>
-                        <Button
-                            type='button'
-                            className={'btn-dark-blue'}
-                            variant={'primary'}
-                            onClick={() => {
-                                console.log({code});
-                                sendCodeToServer(code);
-                            }}
-                        >Submit Code</Button>
-                    </div>
-                    <br/>
-                    <br/>
-                    <ExerciseConsole alert={alert.alert} consoleOutput={consoleOutput}/>
+                    <ExerciseCodingArea
+                        code={code}
+                        setCode={setCode}/>
+                    <SubmitCodeButton
+                        isLoading={isLoading}
+                        callback={() => sendCodeToServer(code)}
+                    />
                 </Col>
                 <Col>
-                    <ExerciseSummary summary={summary}/>
+                    <InformationArea
+                        alert={alert.alert}
+                        consoleOutput={consoleOutput}
+                        summary={summary}
+                    />
                     <br/>
-                    <VisualiserArea solution={result} weights={data} animation={animation}/>
+                    <AnimationTab solution={result} weights={data} animation={animation}/>
                 </Col>
             </Row>
             <br/>
@@ -99,27 +98,140 @@ const ExerciseCodingArea = ({exercise, animation}) => {
     );
 };
 
-const ExerciseConsole = ({consoleOutput, alert}) => (
-    <ShadowedCard>
-        <Card.Header as={'h5'}>Console Output</Card.Header>
+const ExerciseCodingArea = ({code, setCode}) => {
+
+    const map = new Map();
+    map.set('#iterations', (
         <Card.Body>
-            {alert}
-            <Card.Text as={'pre'}>{consoleOutput}</Card.Text>
+            <IterationsOptions/>
         </Card.Body>
-    </ShadowedCard>
-);
+    ));
+
+    map.set('#data', (
+        <Card.Body>
+            <p>Data</p>
+        </Card.Body>
+    ));
+
+    map.set('#editor', (
+        <ExerciseEditor code={code} setCode={setCode}/>
+    ));
+
+    const [selected, setSelected] = useState(map.get('#editor'));
+
+    return (
+        <ShadowedCard>
+            <CodingTabs changeTab={(selectedTab) => setSelected(map.get(selectedTab))}/>
+            {selected}
+        </ShadowedCard>
+    );
+};
+
+const CodingTabs = ({changeTab}) => {
+    return (
+        <Card.Header as={'h5'}>
+            <Nav
+                onSelect={(selectedKey) => changeTab(selectedKey)}
+                fill={true}
+                variant="tabs"
+                defaultActiveKey={'#editor'}>
+                <Nav.Item>
+                    <Nav.Link href="#editor">Editor</Nav.Link>
+                </Nav.Item>
+                <Nav.Item>
+                    <Nav.Link href="#iterations">Iterations</Nav.Link>
+                </Nav.Item>
+                <Nav.Item>
+                    <Nav.Link href="#data">Data</Nav.Link>
+                </Nav.Item>
+            </Nav>
+        </Card.Header>
+    );
+};
+
+const IterationsOptions = () => {
+    const [value, setValue] = useState('1000');
+
+    return (
+        <div style={{textAlign: 'center'}}>
+            <h5>Number of Iterations: </h5>
+            <h5>{(value).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ')}</h5>
+            <IterationsSlider value={value} setValue={setValue}/>
+        </div>
+    );
+};
+
+const IterationsSlider = ({value, setValue}) => {
+
+    return (
+        <div className="line controls">
+            <input className="progress" type="range" min="1" max="1000000" value={value}
+                   style={{width: '50%'}}
+                   onChange={(event) => {
+                       setValue(event.target.value);
+                   }}/>
+        </div>
+    );
+};
+
+const InformationArea = ({consoleOutput, alert, summary}) => {
+
+    const selectedComponent = () => {
+        switch (selected) {
+            case '#summary':
+                return <SummaryTab summary={summary}/>;
+            case '#console':
+            default:
+                return <ConsoleTab consoleOutput={consoleOutput}/>;
+        }
+    };
+
+    const [selected, setSelected] = useState('#console');
+
+    return (
+        <ShadowedCard>
+            <ConsoleTabs changeTab={(selectedTab) => setSelected(selectedTab)}/>
+            <Card.Body>
+                {alert}
+                {selectedComponent()}
+            </Card.Body>
+        </ShadowedCard>
+    );
+};
+
+const ConsoleTab = ({consoleOutput}) => {
+    return (
+        <Card.Text as={'pre'}>{consoleOutput}</Card.Text>
+    );
+};
+
+const ConsoleTabs = ({changeTab}) => {
+    return (
+        <Card.Header as={'h5'}>
+            <Nav
+                onSelect={(selectedKey) => changeTab(selectedKey)}
+                fill={true}
+                variant="tabs"
+                defaultActiveKey={'#console'}>
+                <Nav.Item>
+                    <Nav.Link href="#console">Console</Nav.Link>
+                </Nav.Item>
+                <Nav.Item>
+                    <Nav.Link href="#summary">Summary</Nav.Link>
+                </Nav.Item>
+            </Nav>
+        </Card.Header>
+    );
+};
 
 
-const ExerciseSummary = ({summary}) => (
-    <ShadowedCard>
-        <Card.Header as={'h5'}>Summary</Card.Header>
-        <ListGroup variant={'flush'}>
-            <ListGroup.Item>Fitness: {summary.fitness}</ListGroup.Item>
-            <ListGroup.Item>Time Run: {summary.timeRun}</ListGroup.Item>
-            <ListGroup.Item>Iterations: {summary.iterations}</ListGroup.Item>
-            <ListGroup.Item>Efficacy: {summary.efficacy}</ListGroup.Item>
-        </ListGroup>
-    </ShadowedCard>
+const SummaryTab = ({summary}) => (
+    <ListGroup variant={'flush'}>
+        <ListGroup.Item>Fitness: {summary.fitness}</ListGroup.Item>
+        <ListGroup.Item>Time Run: {summary.timeRun}</ListGroup.Item>
+        <ListGroup.Item>Iterations: {summary.iterations}</ListGroup.Item>
+        <ListGroup.Item>Efficacy: {summary.efficacy}</ListGroup.Item>
+    </ListGroup>
 );
 
 const ShadowedCard = ({children}) => {
@@ -130,7 +242,7 @@ const ShadowedCard = ({children}) => {
     );
 };
 
-const VisualiserArea = ({solution, weights, animation}) => {
+const AnimationTab = ({solution, weights, animation}) => {
 
     return (
         <ShadowedCard>
@@ -141,6 +253,26 @@ const VisualiserArea = ({solution, weights, animation}) => {
                 </Container>
             </Card.Body>
         </ShadowedCard>
+    );
+};
+
+const SubmitCodeButton = ({callback, isLoading}) => {
+    return (
+
+        <div className={'float-right'}>
+            {isLoading && <Spinner
+                animation="grow"
+                size='sm'
+                role='status'
+                className={'dark-blue'}
+            />}{' '}{' '}
+            <Button
+                type='button'
+                className={'btn-dark-blue'}
+                variant={'primary'}
+                onClick={callback}
+            >Submit Code</Button>
+        </div>
     );
 };
 
