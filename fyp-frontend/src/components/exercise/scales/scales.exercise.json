@@ -12,7 +12,7 @@
     "className": "ScalesProblem",
     "packageName": "com.exercise",
     "methodToCall": "runScales",
-    "iterations": 1000,
+    "iterations": 250000,
     "defaultStarterCode": [
       "public class ScalesProblem {\n",
       "    public List<Integer> runScales(List<Double> weights, int iterations) {\n",

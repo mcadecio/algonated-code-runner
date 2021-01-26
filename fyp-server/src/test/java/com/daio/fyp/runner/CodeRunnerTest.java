@@ -175,9 +175,7 @@ class CodeRunnerTest {
 
             assertTrue(returnValue.isEmpty());
             assertFalse(codeRunner.isSuccess());
-            assertEquals("java.lang.NoSuchMethodException: " +
-                    "No similar method aaa with params [class java.util.ArrayList, class java.lang.Integer] " +
-                    "could be found on type class com.example.Scratch.", codeRunner.getErrorMessage());
+            assertTrue(codeRunner.getErrorMessage().startsWith("java.lang.NoSuchMethodException: "));
         }
 
         @Test
@@ -205,7 +203,7 @@ class CodeRunnerTest {
 
             assertEquals(Collections.singletonList(5), returnValue);
             assertTrue(codeRunner.isSuccess());
-            assertEquals("", codeRunner.getErrorMessage());
+            assertEquals("Compile and Run was a success!", codeRunner.getErrorMessage());
         }
 
     }

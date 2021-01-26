@@ -69,6 +69,7 @@ public class CodeRunner {
             runnerSummary.setTimeRun(timer.elapsed(TimeUnit.MILLISECONDS));
             runnerSummary.setIterations(options.getIterations());
             isSuccess = true;
+            errorMessage = "Compile and Run was a success!";
             return valueToReturn;
         } catch (ReflectException reflectException) {
             handleError(reflectException.getMessage());

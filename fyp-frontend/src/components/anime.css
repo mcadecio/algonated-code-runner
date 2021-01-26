@@ -731,3 +731,6 @@ input.progress[value]::-webkit-slider-thumb {
         width: 50%;
     }
 }
+a {
+    color: rgb(0, 50, 91);
+}

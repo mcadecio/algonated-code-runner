@@ -47,7 +47,7 @@ const ScaleWithSVGScale = ({solution, weights}) => {
 
     return (
         <>
-            <SeekScaleAnimation inputWidth={inputWidth}/>
+            <SeekScaleAnimation inputWidth={inputWidth} weights={weights.length}/>
         </>
     );
 }

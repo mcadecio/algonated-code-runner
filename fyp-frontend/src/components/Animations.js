@@ -9,6 +9,7 @@ import data from './data.json';
 import '../App.css';
 import SVGScale from './exercise/scales/SVGScale';
 import './anime.css';
+import {MyMonacoEditor} from './exercise/ExerciseEditor';
 
 
 const CirclesAcross = () => (
@@ -552,7 +553,7 @@ const ScaleAnimationWithSVG = () => {
     );
 };
 
-const SeekScaleAnimation = ({inputWidth, withOptions = false}) => {
+const SeekScaleAnimation = ({inputWidth, weights = 1000, withOptions = false}) => {
 
     const [value, setValue] = useState('0');
 
@@ -601,9 +602,9 @@ const SeekScaleAnimation = ({inputWidth, withOptions = false}) => {
         let width = -1 * (inputWidth.left - inputWidth.right);
 
         if (width > 0) {
-            animationScale.current.seek(animationScale.current.duration * (width / 1000));
+            animationScale.current.seek(animationScale.current.duration * (width / weights));
         } else {
-            animationScaleNegative.current.seek(animationScaleNegative.current.duration * (Math.abs(width) / 1000));
+            animationScaleNegative.current.seek(animationScaleNegative.current.duration * (Math.abs(width) / weights));
         }
         console.debug({width});
         console.debug({inputWidth});
@@ -613,9 +614,9 @@ const SeekScaleAnimation = ({inputWidth, withOptions = false}) => {
 
         if (withOptions) {
             if (value > 0) {
-                animationScale.current.seek(animationScale.current.duration * (`${value}` / 1000));
+                animationScale.current.seek(animationScale.current.duration * (`${value}` / weights));
             } else {
-                animationScaleNegative.current.seek(animationScaleNegative.current.duration * (Math.abs(value) / 1000));
+                animationScaleNegative.current.seek(animationScaleNegative.current.duration * (Math.abs(value) / weights));
             }
             console.debug({value});
         }
@@ -680,6 +681,11 @@ export default function Animations() {
     return (
         <>
             <SeekScaleAnimation inputWidth={{left: '500', right: '500'}} withOptions={true}/>
+            <br/>
+            <br/>
+            <br/>
+            <br/>
+            <MyMonacoEditor/>
         </>
     );
 }

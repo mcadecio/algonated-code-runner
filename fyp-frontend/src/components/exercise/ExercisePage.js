@@ -4,7 +4,7 @@ import Card from 'react-bootstrap/Card';
 import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
 import Container from 'react-bootstrap/Container';
-import ExerciseEditor from './ExerciseEditor';
+import ExerciseEditor, {DataInputEditor, MonacoDataEditor, MonacoExerciseEditor} from './ExerciseEditor';
 import DangerDismissibleAlert from '../DangerDismissibleAlert';
 import ListGroup from 'react-bootstrap/ListGroup';
 import Button from 'react-bootstrap/Button';
@@ -23,11 +23,10 @@ function ExercisePage({problem}) {
 
 const TheWholePage = ({exercise, animation}) => {
     const alert = DangerDismissibleAlert({innerText: 'It looks like something went wrong, check the output !'});
-
     const [code, setCode] = useState(exercise.defaultStarterCode.join(' '));
-
     const [isLoading, setLoading] = useState(false);
-
+    const [iterations, setIterations] = useState(exercise.iterations.toString());
+    const [exerciseData, setExerciseData] = useState(JSON.stringify({data: exercise.data}, null, 2));
     const [{consoleOutput, result, data, summary}, setConsoleOutput] = useState({
         isSuccess: false,
         consoleOutput: 'There\'s nothing here yet',
@@ -45,7 +44,9 @@ const TheWholePage = ({exercise, animation}) => {
         setLoading(true);
         const request = {
             ...exercise,
-            code: value
+            code: value,
+            data: JSON.parse(exerciseData).data,
+            iterations: Number.parseInt(iterations, 10)
         };
         console.debug({request});
         let endpoint = `${process.env.REACT_APP_FYP_SERVER_DOMAIN}${exercise.endpoint}`;
@@ -77,7 +78,11 @@ const TheWholePage = ({exercise, animation}) => {
                 <Col>
                     <ExerciseCodingArea
                         code={code}
-                        setCode={setCode}/>
+                        setCode={setCode}
+                        iterations={iterations}
+                        setIterations={setIterations}
+                        data={exerciseData}
+                        setData={setExerciseData}/>
                     <SubmitCodeButton
                         isLoading={isLoading}
                         callback={() => sendCodeToServer(code)}
@@ -98,23 +103,21 @@ const TheWholePage = ({exercise, animation}) => {
     );
 };
 
-const ExerciseCodingArea = ({code, setCode}) => {
+const ExerciseCodingArea = ({code, setCode, iterations, setIterations, data, setData}) => {
 
     const map = new Map();
     map.set('#iterations', (
         <Card.Body>
-            <IterationsOptions/>
+            <IterationsOptions iterations={iterations} setIterations={setIterations}/>
         </Card.Body>
     ));
 
     map.set('#data', (
-        <Card.Body>
-            <p>Data</p>
-        </Card.Body>
+        <DataOptions data={data} setData={setData}/>
     ));
 
     map.set('#editor', (
-        <ExerciseEditor code={code} setCode={setCode}/>
+        <MonacoExerciseEditor code={code} setCode={setCode} language={'java'}/>
     ));
 
     const [selected, setSelected] = useState(map.get('#editor'));
@@ -124,6 +127,18 @@ const ExerciseCodingArea = ({code, setCode}) => {
             <CodingTabs changeTab={(selectedTab) => setSelected(map.get(selectedTab))}/>
             {selected}
         </ShadowedCard>
+    );
+};
+
+const DataOptions = ({data, setData}) => {
+    // const [innerValue, setInnerValue] = useState(data);
+    //
+    // useEffect(() => {
+    //     setIterations(innerValue);
+    // }, [innerValue, setIterations])
+
+    return (
+        <MonacoDataEditor data={data} setData={setData} language={'json'}/>
     );
 };
 
@@ -149,23 +164,27 @@ const CodingTabs = ({changeTab}) => {
     );
 };
 
-const IterationsOptions = () => {
-    const [value, setValue] = useState('1000');
+const IterationsOptions = ({iterations, setIterations}) => {
+
+    const [innerValue, setInnerValue] = useState(iterations);
+
+    useEffect(() => {
+        setIterations(innerValue);
+    }, [innerValue, setIterations]);
 
     return (
         <div style={{textAlign: 'center'}}>
             <h5>Number of Iterations: </h5>
-            <h5>{(value).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ')}</h5>
-            <IterationsSlider value={value} setValue={setValue}/>
+            <h5>{(innerValue).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ')}</h5>
+            <IterationsSlider value={(innerValue).toString()} setValue={setInnerValue}/>
         </div>
     );
 };
 
 const IterationsSlider = ({value, setValue}) => {
-
     return (
         <div className="line controls">
-            <input className="progress" type="range" min="1" max="1000000" value={value}
+            <input className="progress" type="range" min="1" max="500000" value={value}
                    style={{width: '50%'}}
                    onChange={(event) => {
                        setValue(event.target.value);
