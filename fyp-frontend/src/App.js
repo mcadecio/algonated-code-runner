@@ -4,13 +4,14 @@ import {BrowserRouter as Router, Link, Redirect, Route, Switch} from 'react-rout
 import AuthProvider from './components/auth/AuthContext';
 import AuthNav from './components/auth/AuthButton';
 import LoginPage from './components/home/login/LoginPage';
-import PrivateRoute from './components/PrivateRoute';
-import ScalesExercise from './components/exercise/scales/ScalesExercise';
+import {ScalesExercise} from './components/exercise/scales/ScalesExercise';
 import {TSPAnimation, TSPExercise} from './components/exercise/tsp/TSPExercise';
 import Animations from './components/Animations';
 import Navbar from 'react-bootstrap/Navbar';
 import Nav from 'react-bootstrap/Nav';
 import ExerciseView from './components/exercise/ExerciseView';
+import ReactPlayer from 'react-player/file';
+import video from './404.mp4';
 
 function App() {
 
@@ -27,7 +28,6 @@ function App() {
                     </Navbar>
                 </div>
                 <div style={{margin: '3%'}}>
-
                     <Switch>
                         <Route exact path={'/'}>
                             <Redirect to={'/exercises'}/>
@@ -40,6 +40,18 @@ function App() {
                         <Route exact path='/exercises' component={ExerciseView}/>
                         <Route exact path="/exercises/scales" component={ScalesExercise}/>
                         <Route exact path="/exercises/tsp" component={TSPExercise}/>
+                        <Route path="*">
+                            <br/>
+                            <div className={'d-flex justify-content-center'}>
+                                <ReactPlayer
+                                    playing={true}
+                                    muted={true}
+                                    url={video}
+                                    loop={true}
+                                    controls={false}
+                                />
+                            </div>
+                        </Route>
                     </Switch>
                 </div>
             </Router>

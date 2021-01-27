@@ -1,87 +1,10 @@
-import React, {Component, useEffect, useRef, useState} from 'react';
-import Anime, {anime} from 'react-anime';
-import Container from 'react-bootstrap/Container';
-import Col from 'react-bootstrap/Col';
-import Row from 'react-bootstrap/Row';
+import React, {useEffect, useRef, useState} from 'react';
+import {anime} from 'react-anime';
 import Button from 'react-bootstrap/Button';
 import * as d3 from 'd3';
 import data from './data.json';
 import '../App.css';
-import SVGScale, {ControlledSVGScale} from './exercise/scales/SVGScale';
 import './anime.css';
-import {MyMonacoEditor} from './exercise/ExerciseEditor';
-
-
-const CirclesAcross = () => (
-    <Anime easing="easeOutElastic"
-           loop={true}
-           duration={1000}
-           direction="alternate"
-           delay={(el, index) => index * 240}
-           translateX='13rem'
-           scale={[.75, .9]}
-    >
-        <span className='glyphicon glyphicon-one-fine-dot blue'/>
-        <span className='glyphicon glyphicon-one-fine-dot red'/>
-        <span className='glyphicon glyphicon-one-fine-dot green'/>
-    </Anime>
-);
-
-// Reactive Animations
-
-
-class Clock extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {currentCount: 10};
-    }
-
-    timer() {
-        this.setState({
-            currentCount: this.state.currentCount + 1
-        });
-        if (this.state.currentCount < 1) {
-            clearInterval(this.intervalId);
-        }
-    }
-
-    componentDidMount() {
-        this.intervalId = setInterval(this.timer.bind(this), 1000);
-    }
-
-    componentWillUnmount() {
-        clearInterval(this.intervalId);
-    }
-
-    render() {
-        return (
-            <>
-
-                <div>{this.state.currentCount}</div>
-            </>
-        );
-    }
-}
-
-
-const DFACounter = () => {
-
-    return (
-        <Container>
-            <br/>
-            <Row>
-                <Col>
-                    <br/>
-                    <br/>
-                    <br/>
-                    <br/>
-                    <br/>
-                    <BarUpAndDownAnimation/>
-                </Col>
-            </Row>
-        </Container>
-    );
-};
 
 const styles = {
     circle: {
@@ -100,52 +23,7 @@ const styles = {
     }
 };
 
-const NormalUpDownAnimation = () => (
-    <UpDownAnimation
-        initialIncrement={true}
-        initialCount={0}
-        incrementBy={100}
-    />
-);
-
-const ReverseUpDownAnimation = () => (
-    <UpDownAnimation
-        initialIncrement={false}
-        initialCount={100}
-        incrementBy={100}
-    />
-);
-
-const UpDownAnimation = ({initialCount, initialIncrement, incrementBy}) => {
-    const [{count, increment}, setCounter] = useState({
-        count: initialCount,
-        increment: initialIncrement
-    });
-
-    const incrementCount = (valueToIncrement) => {
-        setCounter(oldCount => ({
-            count: oldCount.increment ? oldCount.count + valueToIncrement : oldCount.count - valueToIncrement,
-            increment: !oldCount.increment
-        }));
-    };
-
-    useEffect(() => {
-        setInterval(() => {
-            incrementCount(incrementBy);
-        }, 1500);
-    }, [incrementBy]);
-
-    return (
-        <Anime
-            loop={true}
-            translateY={[count]}
-            duration={2000}
-        >
-            <div style={styles.circle}/>
-        </Anime>
-    );
-};
-
+// eslint-disable-next-line
 const ChargedAnimation = () => {
 
     const [battery, updateBattery] = useState({
@@ -193,50 +71,7 @@ const ChargedAnimation = () => {
     );
 };
 
-
-const BarUpAndDownAnimation = () => {
-    let initialCount = 0;
-    let initialIncrement = false;
-    let incrementBy = 500;
-    const [{count, increment}, setCounter] = useState({
-        count: initialCount,
-        increment: initialIncrement
-    });
-
-    const incrementCount = (valueToIncrement) => {
-        setCounter(oldCount => ({
-            count: oldCount.increment ? oldCount.count + valueToIncrement : oldCount.count - valueToIncrement,
-            increment: !oldCount.increment
-        }));
-    };
-
-    // useEffect(() => {
-    //     setInterval(() => {
-    //         incrementCount(incrementBy);
-    //     }, 1500);
-    // }, [incrementBy]);
-
-
-    return (
-        <div>
-            <Anime
-                translateY={[count]}
-                easing={'linear'}
-            >
-                <div style={{...styles.bar, height: 500, background: 'red'}}/>
-            </Anime>
-            <div style={{...styles.bar, left: '46%', zIndex: 0, position: 'absolute'}}/>
-            <Button constiant={'light'} onClick={() => setCounter({count: 0, increment: true})}>
-                UP
-            </Button>
-            <Button constiant='light' onClick={() => setCounter({count: 500, increment: false})}>
-                DOWN
-            </Button>
-            <br/>
-        </div>
-    );
-};
-
+// eslint-disable-next-line
 const Animation = () => {
     const animationRef = useRef(null);
     useEffect(() => {
@@ -265,6 +100,7 @@ const Animation = () => {
 
 };
 
+// eslint-disable-next-line
 const ChargedAnimationAnimeJS = () => {
     const animationRef = useRef(null);
 
@@ -288,6 +124,7 @@ const ChargedAnimationAnimeJS = () => {
                 }
             }
         });
+        // eslint-disable-next-line
     }, []);
     return (
         <div className="App">
@@ -298,6 +135,7 @@ const ChargedAnimationAnimeJS = () => {
 
 };
 
+// eslint-disable-next-line
 const FixedNodes = () => {
     const accessToRef = useRef();
     const data = {
@@ -380,6 +218,7 @@ const FixedNodes = () => {
     );
 };
 
+// eslint-disable-next-line
 const SimpleNetworkGraph = () => {
 
     const animationRef = useRef();
@@ -469,207 +308,9 @@ const SimpleNetworkGraph = () => {
     );
 };
 
-const ScaleAnimationWithSVG = () => {
-
-    const [rotation, setRotation] = useState(0);
-
-    const animationRef = useRef();
-
-    const [counter, setCounter] = useState(0);
-
-    useEffect(() => {
-
-        const duration = 3000;
-
-        animationRef.current = anime({
-            targets: '.el',
-            keyframes: [
-                {rotate: -30},
-                {rotate: 0},
-                {rotate: 30},
-                {rotate: 0}
-            ],
-            duration: duration,
-            loop: true,
-            easing: 'linear'
-        });
-
-        anime({
-            targets: '#basket-and-handles-left',
-            keyframes: [
-                {translateY: 50},
-                {translateY: 0},
-                {translateY: -50},
-                {translateY: 0}
-            ],
-            duration: duration,
-            loop: true,
-            easing: 'linear'
-        });
-
-        anime({
-            targets: '#basket-and-handles-right',
-            keyframes: [
-                {translateY: -50},
-                {translateY: 0},
-                {translateY: 50},
-                {translateY: 0}
-            ],
-            duration: duration,
-            loop: true,
-            easing: 'linear'
-        });
-
-        setInterval(() => {
-            setCounter(old => old + 1);
-        }, 1500);
-
-        //
-        // setStyle({
-        //     transformBox: "fill-box",
-        //     transformOrigin: 'center',
-        //     transform: `rotate(${rotation}deg)`
-        // })
-    }, [rotation]);
-
-    return (
-        <>
-            <Button variant={'light'} onClick={() => setRotation(old => old + 1)}>
-                Up
-            </Button>
-            <Button variant={'light'} onClick={() => setRotation(old => old - 1)}>
-                DOWN
-            </Button>
-            <Button onClick={() => animationRef.current.restart()} variant={'light'}>
-                Restart
-            </Button>
-            <SVGScale
-                topPartId={'el'}
-                leftBasketId={'basket-and-handles-left'}
-                rightBasketId={'basket-and-handles-right'}
-                basketInnerText={{left: counter, right: counter}}/>
-        </>
-
-    );
-};
-
-const SeekScaleAnimation = ({inputWidth, weights = 1000, withOptions = false}) => {
-
-    const [topPartRotation, setTopPartRotation] = useState('0deg');
-    const [translateY, setTranslateY] = useState('0');
-
-    const [value, setValue] = useState('0');
-
-    useEffect(() => {
-        let width = -1 * (inputWidth.left - inputWidth.right);
-
-        let rotation = (width * 30) / weights;
-        let translation = (width * 50) / weights;
-
-        if (rotation > 30) {
-            rotation = 30;
-        } else if (rotation < -30) {
-            rotation = -30;
-        }
-
-        if (translation > 50) {
-            translation = 50;
-        } else if (translation < -50) {
-            translation = -50;
-        }
-
-        console.log(rotation);
-
-        setTopPartRotation(`${rotation}deg`);
-        setTranslateY(translation.toString(10))
-
-    }, [inputWidth, weights]);
-
-    useEffect(() => {
-
-        if (withOptions) {
-        let rotation = (value * 30) / 1000;
-        let translation = (value * 50) / 1000;
-
-        console.log(rotation);
-
-        setTopPartRotation(`${rotation}deg`);
-        setTranslateY(translation.toString(10))
-
-        }
-    }, [value]);
-
-
-    return (
-        <>
-            {withOptions &&
-            <Row>
-                <Col>
-                    <ControlledSVGScale
-                        topPartId={'el'}
-                        leftBasketId={'basket-and-handles-left'}
-                        rightBasketId={'basket-and-handles-right'}
-                        basketInnerText={inputWidth}
-                        topPartRotation={topPartRotation}
-                        translateY={translateY}/>
-                </Col>
-                <Col>
-                    {withOptions && <div className="">
-                        <div className="line controls">
-                            <input className="progress" type="range" min="-1000" max="1000" value={value}
-                                   onChange={(event) => {
-                                       setValue(event.target.value);
-                                   }}/>
-                        </div>
-                        <h5>Left: {!withOptions && inputWidth.left} {withOptions && (function () {
-                            let parsedValue = Number.parseInt(value, 10);
-                            if (parsedValue === 0) {
-                                return parsedValue;
-                            } else if (parsedValue > 0) {
-                                return 1000 - parsedValue;
-
-                            } else {
-                                return Math.abs(parsedValue);
-                            }
-                        })()}
-                            | Right: {!withOptions && inputWidth.right} {withOptions && (function () {
-                                let parsedValue = Number.parseInt(value, 10);
-                                if (parsedValue === 0) {
-                                    return parsedValue;
-                                } else if (parsedValue > 0) {
-                                    return Math.abs(parsedValue);
-
-                                } else {
-                                    return parsedValue + 1000;
-                                }
-                            })()}</h5>
-                    </div>}
-                </Col>
-            </Row>}
-
-            {!withOptions && <ControlledSVGScale
-                topPartId={'el'}
-                leftBasketId={'basket-and-handles-left'}
-                rightBasketId={'basket-and-handles-right'}
-                basketInnerText={inputWidth}
-                topPartRotation={topPartRotation}
-                translateY={translateY}/>
-            }
-        </>
-    );
-};
-
 export default function Animations() {
     return (
         <>
-            <SeekScaleAnimation inputWidth={{left: '500', right: '500'}} withOptions={true}/>
-            <br/>
-            <br/>
-            <br/>
-            <br/>
-            <MyMonacoEditor/>
         </>
     );
 }
-
-export {SeekScaleAnimation};

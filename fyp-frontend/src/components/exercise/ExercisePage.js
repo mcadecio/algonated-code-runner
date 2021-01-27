@@ -4,7 +4,7 @@ import Card from 'react-bootstrap/Card';
 import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
 import Container from 'react-bootstrap/Container';
-import ExerciseEditor, {DataInputEditor, MonacoDataEditor, MonacoExerciseEditor} from './ExerciseEditor';
+import {MonacoDataEditor, MonacoExerciseEditor} from './ExerciseEditor';
 import DangerDismissibleAlert from '../DangerDismissibleAlert';
 import ListGroup from 'react-bootstrap/ListGroup';
 import Button from 'react-bootstrap/Button';
@@ -265,7 +265,7 @@ const AnimationTab = ({solution, weights, animation}) => {
 
     return (
         <ShadowedCard>
-            <Card.Header as={'h5'}>Visualiser Area</Card.Header>
+            <Card.Header as={'h5'}>Animation</Card.Header>
             <Card.Body>
                 <Container style={{background: 'white', border: '1px solid', textAlign: 'center'}}>
                     {animation({solution, weights})}
