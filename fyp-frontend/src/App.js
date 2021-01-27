@@ -11,7 +11,6 @@ import Navbar from 'react-bootstrap/Navbar';
 import Nav from 'react-bootstrap/Nav';
 import ExerciseView from './components/exercise/ExerciseView';
 import ReactPlayer from 'react-player/file';
-import video from './404.mp4';
 
 function App() {
 
@@ -46,7 +45,7 @@ function App() {
                                 <ReactPlayer
                                     playing={true}
                                     muted={true}
-                                    url={video}
+                                    url={'https://cdn.dribbble.com/users/5139370/screenshots/15008550/media/a9b073c175dd3d5d93c2c681da6a311e.mp4'}
                                     loop={true}
                                     controls={false}
                                 />
