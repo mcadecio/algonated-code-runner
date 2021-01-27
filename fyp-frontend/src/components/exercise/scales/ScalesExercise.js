@@ -5,7 +5,7 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import {ExercisePage} from '../ExercisePage';
 import {SeekScaleAnimation} from '../../Animations';
-const maxWidth = 778;
+const maxWidth = 747;
 
 const ScalesExercise = () => {
 

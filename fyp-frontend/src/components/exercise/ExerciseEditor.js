@@ -130,7 +130,7 @@ const MyMonacoEditor = () => {
                 theme="vs-dark"
                 value={editorValue}
                 language={'json'}
-                options={monacoEditorConfig}
+                options={monacoEditorConfig()}
                 onChange={value => setValue(value)}
             />
         </div>

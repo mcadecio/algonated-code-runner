@@ -7,7 +7,7 @@ import Button from 'react-bootstrap/Button';
 import * as d3 from 'd3';
 import data from './data.json';
 import '../App.css';
-import SVGScale from './exercise/scales/SVGScale';
+import SVGScale, {ControlledSVGScale} from './exercise/scales/SVGScale';
 import './anime.css';
 import {MyMonacoEditor} from './exercise/ExerciseEditor';
 
@@ -555,70 +555,47 @@ const ScaleAnimationWithSVG = () => {
 
 const SeekScaleAnimation = ({inputWidth, weights = 1000, withOptions = false}) => {
 
+    const [topPartRotation, setTopPartRotation] = useState('0deg');
+    const [translateY, setTranslateY] = useState('0');
+
     const [value, setValue] = useState('0');
 
-    const animationScale = useRef();
-
-    const animationScaleNegative = useRef();
-
     useEffect(() => {
-        const elasticity = 200;
-        const duration = 3000;
-        const easing = 'easeInOutSine';
-        const autoplay = false;
-
-        animationScale.current = anime.timeline({
-            targets: '.el',
-            rotate: 30,
-            elasticity,
-            autoplay,
-            easing
-        }).add({
-            targets: '#basket-and-handles-left',
-            translateY: -50
-        }, 0).add({
-            targets: '#basket-and-handles-right',
-            translateY: 50
-        }, 0);
-
-        animationScaleNegative.current = anime.timeline({
-            targets: '.el',
-            rotate: -30,
-            elasticity,
-            autoplay,
-            easing
-        }).add({
-            targets: '#basket-and-handles-left',
-            translateY: 50
-        }, 0).add({
-            targets: '#basket-and-handles-right',
-            translateY: -50
-        }, 0);
-
-    }, []);
-
-    useEffect(() => {
-
         let width = -1 * (inputWidth.left - inputWidth.right);
 
-        if (width > 0) {
-            animationScale.current.seek(animationScale.current.duration * (width / weights));
-        } else {
-            animationScaleNegative.current.seek(animationScaleNegative.current.duration * (Math.abs(width) / weights));
+        let rotation = (width * 30) / weights;
+        let translation = (width * 50) / weights;
+
+        if (rotation > 30) {
+            rotation = 30;
+        } else if (rotation < -30) {
+            rotation = -30;
         }
-        console.debug({width});
-        console.debug({inputWidth});
-    }, [inputWidth]);
+
+        if (translation > 50) {
+            translation = 50;
+        } else if (translation < -50) {
+            translation = -50;
+        }
+
+        console.log(rotation);
+
+        setTopPartRotation(`${rotation}deg`);
+        setTranslateY(translation.toString(10))
+
+    }, [inputWidth, weights]);
 
     useEffect(() => {
 
         if (withOptions) {
-            if (value > 0) {
-                animationScale.current.seek(animationScale.current.duration * (`${value}` / weights));
-            } else {
-                animationScaleNegative.current.seek(animationScaleNegative.current.duration * (Math.abs(value) / weights));
-            }
-            console.debug({value});
+        let rotation = (value * 30) / 1000;
+        let translation = (value * 50) / 1000;
+
+        console.log(rotation);
+
+        setTopPartRotation(`${rotation}deg`);
+        setTranslateY(translation.toString(10))
+
         }
     }, [value]);
 
@@ -628,16 +605,18 @@ const SeekScaleAnimation = ({inputWidth, weights = 1000, withOptions = false}) =
             {withOptions &&
             <Row>
                 <Col>
-                    <SVGScale
+                    <ControlledSVGScale
                         topPartId={'el'}
                         leftBasketId={'basket-and-handles-left'}
                         rightBasketId={'basket-and-handles-right'}
-                        basketInnerText={inputWidth}/>
+                        basketInnerText={inputWidth}
+                        topPartRotation={topPartRotation}
+                        translateY={translateY}/>
                 </Col>
                 <Col>
                     {withOptions && <div className="">
                         <div className="line controls">
-                            <input className="progress" step=".001" type="range" min="-1000" max="1000" value={value}
+                            <input className="progress" type="range" min="-1000" max="1000" value={value}
                                    onChange={(event) => {
                                        setValue(event.target.value);
                                    }}/>
@@ -668,11 +647,14 @@ const SeekScaleAnimation = ({inputWidth, weights = 1000, withOptions = false}) =
                 </Col>
             </Row>}
 
-            {!withOptions && <SVGScale
+            {!withOptions && <ControlledSVGScale
                 topPartId={'el'}
                 leftBasketId={'basket-and-handles-left'}
                 rightBasketId={'basket-and-handles-right'}
-                basketInnerText={inputWidth}/>}
+                basketInnerText={inputWidth}
+                topPartRotation={topPartRotation}
+                translateY={translateY}/>
+            }
         </>
     );
 };
