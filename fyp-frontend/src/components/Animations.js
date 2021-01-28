@@ -1,10 +1,8 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {anime} from 'react-anime';
-import Button from 'react-bootstrap/Button';
-import * as d3 from 'd3';
-import data from './data.json';
 import '../App.css';
 import './anime.css';
+import {createMixedSpiralNodes, createSequentialEdges, Graph} from './exercise/tsp/GraphComponents';
 
 const styles = {
     circle: {
@@ -135,182 +133,20 @@ const ChargedAnimationAnimeJS = () => {
 
 };
 
-// eslint-disable-next-line
-const FixedNodes = () => {
-    const accessToRef = useRef();
-    const data = {
-        nodes: [{id: 'A'}, {'id': 'B'}, {'id': 'C'}, {'id': 'D'}],
-        links:
-            [{'source': 'A', 'target': 'B'},
-                {'source': 'B', 'target': 'C'},
-                {'source': 'C', 'target': 'A'},
-                {'source': 'D', 'target': 'A'}]
-    };
-
-    const height = 250;
-    const width = 400;
-
-    useEffect(() => {
-        accessToRef.current = d3.select('.myDiv').append('svg')
-            .attr('width', width)
-            .attr('height', height);
-
-        const svg = accessToRef.current;
-
-        const simulation = d3.forceSimulation()
-            .force('link', d3.forceLink().id(function (d) {
-                return d.id;
-            }).distance(50))
-            // .force('charge', d3.forceManyBody())
-            .force('center', d3.forceCenter(width / 2, height / 2));
-
-        const link = svg.append('g')
-            .selectAll('line')
-            .data(data.links)
-            .enter().append('line')
-            .attr('stroke', 'black');
-
-        const node = svg.append('g')
-            .selectAll('circle')
-            .data(data.nodes)
-            .enter().append('circle')
-            .attr('r', 5);
-
-        simulation
-            .nodes(data.nodes)
-            .on('tick', ticked)
-            .alphaDecay(0);
-
-        simulation.force('link')
-            .links(data.links);
-
-        function ticked() {
-            link
-                .attr('x1', function (d) {
-                    return d.source.x;
-                })
-                .attr('y1', function (d) {
-                    return d.source.y;
-                })
-                .attr('x2', function (d) {
-                    return d.target.x;
-                })
-                .attr('y2', function (d) {
-                    return d.target.y;
-                });
-            node
-                .attr('cx', function (d) {
-                    return d.x;
-                })
-                .attr('cy', function (d) {
-                    return d.y;
-                });
-        }
-
-    }, [data]);
+const MyOwnNetworkGraph = () => {
+    const max = 100;
+    const nodes = createMixedSpiralNodes(max);
+    const links = createSequentialEdges(0);
 
     return (
-        <>
-            <Button onClick={() => data.nodes.push({id: 'F'})}
-                    variant={'light'}>Add node</Button>
-            <div className="myDiv"/>
-        </>
-    );
-};
-
-// eslint-disable-next-line
-const SimpleNetworkGraph = () => {
-
-    const animationRef = useRef();
-    const [myData, updateData] = useState(data);
-
-    const margin = {top: 10, right: 30, bottom: 30, left: 40},
-        width = 400 - margin.left - margin.right,
-        height = 400 - margin.top - margin.bottom;
-
-    useEffect(() => {
-        d3.select('svg').remove();
-        animationRef.current = d3.select('.myDiv').append('svg');
-
-        const svg = animationRef.current
-            .attr('width', width + margin.left + margin.right)
-            .attr('height', height + margin.top + margin.bottom)
-            .append('g')
-            .attr('transform',
-                'translate(' + margin.left + ',' + margin.top + ')');
-
-        // Initialize the links
-        const link = svg
-            .selectAll('line')
-            .data(myData.links)
-            .enter()
-            .append('line')
-            .attr('stroke', 'black');
-
-        // Initialize the nodes
-        const node = svg
-            .selectAll('circle')
-            .data(myData.nodes)
-            .enter()
-            .append('circle')
-            .attr('r', 5);
-
-        // Let's list the force we wanna apply on the network
-        const simulation = d3.forceSimulation(data.nodes)                 // Force algorithm is applied to data.nodes
-            .force('link', d3.forceLink()                               // This force provides links between nodes
-                .id(function (d) {
-                    return d.id;
-                })                     // This provide  the id of a node
-                .links(data.links)                                    // and this the list of links
-            )
-            .force('charge', d3.forceManyBody().strength(-400))         // This adds repulsion between nodes. Play with the -400 for the repulsion strength
-            .force('center', d3.forceCenter(width / 2, height / 2))     // This force attracts nodes to the center of the svg area
-            .on('end', ticked);
-
-        // This function is run at each iteration of the force algorithm, updating the nodes position.
-        function ticked() {
-            link
-                .attr('x1', function (d) {
-                    return d.source.x;
-                })
-                .attr('y1', function (d) {
-                    return d.source.y;
-                })
-                .attr('x2', function (d) {
-                    return d.target.x;
-                })
-                .attr('y2', function (d) {
-                    return d.target.y;
-                });
-
-            node
-                .attr('cx', function (d) {
-                    return d.x;
-                })
-                .attr('cy', function (d) {
-                    return d.y;
-                });
-        }
-
-    }, [myData]);
-
-    return (
-        <>
-            <Button onClick={() => updateData(old => {
-                return {
-                    links: old.links,
-                    nodes: [...old.nodes, {id: '780'}]
-                };
-            })}
-                    variant={'light'}>Add node</Button>
-            <div className="myDiv"/>
-        </>
+            <Graph links={links} nodes={nodes}/>
     );
 };
 
 export default function Animations() {
     return (
-        <>
-        </>
+        <div>
+            <MyOwnNetworkGraph/>
+        </div>
     );
 }

@@ -5,12 +5,13 @@ import AuthProvider from './components/auth/AuthContext';
 import AuthNav from './components/auth/AuthButton';
 import LoginPage from './components/home/login/LoginPage';
 import {ScalesExercise} from './components/exercise/scales/ScalesExercise';
-import {TSPAnimation, TSPExercise} from './components/exercise/tsp/TSPExercise';
+import {TSPExercise} from './components/exercise/tsp/TSPExercise';
 import Animations from './components/Animations';
 import Navbar from 'react-bootstrap/Navbar';
 import Nav from 'react-bootstrap/Nav';
 import ExerciseView from './components/exercise/ExerciseView';
 import ReactPlayer from 'react-player/file';
+import {ResponsiveNetworkAnimation} from './components/exercise/tsp/TSPAnimations';
 
 function App() {
 
@@ -34,7 +35,7 @@ function App() {
                         <Route exact path="/login" component={LoginPage}/>
                         <Route exact path="/exercises/animation" component={Animations}/>
                         <Route exact path="/exercises/tspanimation">
-                            <TSPAnimation solution={[]} weights={[[]]} test={true}/>
+                            <ResponsiveNetworkAnimation solution={[]} weights={[[]]} test={true}/>
                         </Route>
                         <Route exact path='/exercises' component={ExerciseView}/>
                         <Route exact path="/exercises/scales" component={ScalesExercise}/>
