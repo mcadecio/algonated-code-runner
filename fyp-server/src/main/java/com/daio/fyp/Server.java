@@ -10,6 +10,7 @@ import com.daio.fyp.runner.calculator.TSPEfficiencyCalculator;
 import com.daio.fyp.runner.calculator.TSPFitnessCalculator;
 import com.google.gson.Gson;
 import io.vertx.core.AbstractVerticle;
+import io.vertx.core.Handler;
 import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpServer;
@@ -35,37 +36,9 @@ public class Server extends AbstractVerticle {
     public void start(Promise<Void> startPromise) {
 
         final var router = Router.router(vertx);
-
         router.route().handler(BodyHandler.create());
-
-        // Cors
-        router.route().handler(CorsHandler.create(getAllowedDomain())
-                .allowedMethod(io.vertx.core.http.HttpMethod.GET)
-                .allowedMethod(io.vertx.core.http.HttpMethod.POST)
-                .allowedMethod(io.vertx.core.http.HttpMethod.OPTIONS)
-                .allowCredentials(true)
-                .allowedHeader("Authorization")
-                .allowedHeader("Access-Control-Request-Method")
-                .allowedHeader("Access-Control-Allow-Credentials")
-                .allowedHeader("Access-Control-Allow-Origin")
-                .allowedHeader("Access-Control-Allow-Headers")
-                .allowedHeader("Content-Type"));
-
-        router.route().failureHandler(rc -> {
-            logger.error("Error", rc.failure());
-            var response = new Response(
-                    false,
-                    rc.failure().getMessage() == null ?
-                            "Null Pointer Exception, Please review your code and try again" :
-                            rc.failure().getMessage(),
-                    Collections.emptyList(),
-                    rc.getBodyAsJson().getJsonArray("data").getList(),
-                    new CodeRunnerSummary()
-            );
-
-            rc.response().setChunked(true).end(gson.toJson(response));
-        });
-
+        router.route().handler(createCorsHandler());
+        router.route().failureHandler(this::handleFailure);
         router.get().handler(rc -> {
             logger.info("Receiving request on path -> {}", rc.normalisedPath());
             rc.next();
@@ -73,9 +46,27 @@ public class Server extends AbstractVerticle {
 
         router.get("/hello").handler(rc -> rc.response().end("Hello, World!"));
 
-        router.post("/exercise/submit/scales").handler(this::handleScalesRequest);
+        router.post("/exercise/submit/scales").handler(rc -> {
+            rc.vertx().executeBlocking(promise -> {
+                handleScalesRequest(rc);
+                promise.complete();
+            }, result -> {
+                if (result.failed()) {
+                    rc.fail(result.cause());
+                }
+            });
+        });
 
-        router.post("/exercise/submit/tsp").handler(this::handleTSPRequest);
+        router.post("/exercise/submit/tsp").handler(rc -> {
+            rc.vertx().executeBlocking(promise -> {
+                handleTSPRequest(rc);
+                promise.complete();
+            }, result -> {
+                if (result.failed()) {
+                    rc.fail(result.cause());
+                }
+            });
+        });
 
         httpServer = vertx.createHttpServer();
         httpServer
@@ -84,6 +75,21 @@ public class Server extends AbstractVerticle {
                     logger.info("HTTP Server Started ...");
                     startPromise.complete();
                 });
+    }
+
+    private void handleFailure(RoutingContext rc) {
+        logger.error("Error", rc.failure());
+        var response = new Response(
+                false,
+                rc.failure().getMessage() == null ?
+                        "Null Pointer Exception, Please review your code and try again" :
+                        rc.failure().getMessage(),
+                Collections.emptyList(),
+                rc.getBodyAsJson().getJsonArray("data").getList(),
+                new CodeRunnerSummary()
+        );
+
+        rc.response().setChunked(true).end(gson.toJson(response));
     }
 
     private int getPort() {
@@ -98,10 +104,23 @@ public class Server extends AbstractVerticle {
         return allowedDomain;
     }
 
+    private Handler<RoutingContext> createCorsHandler() {
+        return CorsHandler.create(getAllowedDomain())
+                .allowedMethod(io.vertx.core.http.HttpMethod.GET)
+                .allowedMethod(io.vertx.core.http.HttpMethod.POST)
+                .allowedMethod(io.vertx.core.http.HttpMethod.OPTIONS)
+                .allowCredentials(true)
+                .allowedHeader("Authorization")
+                .allowedHeader("Access-Control-Request-Method")
+                .allowedHeader("Access-Control-Allow-Credentials")
+                .allowedHeader("Access-Control-Allow-Origin")
+                .allowedHeader("Access-Control-Allow-Headers")
+                .allowedHeader("Content-Type");
+    }
+
     private void handleTSPRequest(RoutingContext rc) {
         final String prettyRequest = rc.getBodyAsJson().encodePrettily();
         logger.info("This was the code submitted -> \n{}", prettyRequest);
-
 
         final CodeOptions codeOptions = gson.fromJson(prettyRequest, CodeOptions.class);
         codeOptions.<List<List<Double>>, double[][]>setModifier(list ->
@@ -131,8 +150,7 @@ public class Server extends AbstractVerticle {
 
     private void handleScalesRequest(RoutingContext rc) {
         final String prettyRequest = rc.getBodyAsJson().encodePrettily();
-        logger.info("This was the code submitted -> \n{}", prettyRequest);
-
+        logger.debug("This was the code submitted -> \n{}", prettyRequest);
 
         final CodeOptions codeOptions = gson.fromJson(prettyRequest, CodeOptions.class);
 

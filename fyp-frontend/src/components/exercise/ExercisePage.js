@@ -247,7 +247,7 @@ const ConsoleTabs = ({changeTab}) => {
 const SummaryTab = ({summary}) => (
     <ListGroup variant={'flush'}>
         <ListGroup.Item>Fitness: {summary.fitness}</ListGroup.Item>
-        <ListGroup.Item>Time Run: {summary.timeRun}</ListGroup.Item>
+        <ListGroup.Item>Time Run: {summary.timeRun}ms | {summary.timeRun / 1000}s</ListGroup.Item>
         <ListGroup.Item>Iterations: {summary.iterations}</ListGroup.Item>
         <ListGroup.Item>Efficacy: {summary.efficacy}</ListGroup.Item>
     </ListGroup>
