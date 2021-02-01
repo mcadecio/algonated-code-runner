@@ -27,16 +27,17 @@ const TheWholePage = ({exercise, animation}) => {
     const [isLoading, setLoading] = useState(false);
     const [iterations, setIterations] = useState(exercise.iterations.toString());
     const [exerciseData, setExerciseData] = useState(JSON.stringify({data: exercise.data}, null, 2));
-    const [{consoleOutput, result, data, summary}, setConsoleOutput] = useState({
+    const [{consoleOutput, result, data, summary, solutions}, setConsoleOutput] = useState({
         isSuccess: false,
         consoleOutput: 'There\'s nothing here yet',
         result: [],
+        solutions: [],
         data: exercise.data,
         summary: {
             fitness: 0,
-            timeRun: '0ms',
+            timeRun: 0,
             iterations: 0,
-            efficacy: 'None'
+            efficacy: 0
         }
     });
 
@@ -95,7 +96,7 @@ const TheWholePage = ({exercise, animation}) => {
                         summary={summary}
                     />
                     <br/>
-                    <AnimationTab solution={result} weights={data} animation={animation}/>
+                    <AnimationTab solutions={solutions} solution={result} weights={data} animation={animation}/>
                 </Col>
             </Row>
             <br/>
@@ -131,12 +132,6 @@ const ExerciseCodingArea = ({code, setCode, iterations, setIterations, data, set
 };
 
 const DataOptions = ({data, setData}) => {
-    // const [innerValue, setInnerValue] = useState(data);
-    //
-    // useEffect(() => {
-    //     setIterations(innerValue);
-    // }, [innerValue, setIterations])
-
     return (
         <MonacoDataEditor data={data} setData={setData} language={'json'}/>
     );
@@ -261,14 +256,14 @@ const ShadowedCard = ({children}) => {
     );
 };
 
-const AnimationTab = ({solution, weights, animation}) => {
+const AnimationTab = ({solution, weights, animation, solutions}) => {
 
     return (
         <ShadowedCard>
             <Card.Header as={'h5'}>Animation</Card.Header>
             <Card.Body>
                 <Container style={{background: 'white', border: '1px solid', textAlign: 'center'}}>
-                    {animation({solution, weights})}
+                    {animation({solution, weights, solutions})}
                 </Container>
             </Card.Body>
         </ShadowedCard>

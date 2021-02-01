@@ -35,7 +35,7 @@ function App() {
                         <Route exact path="/login" component={LoginPage}/>
                         <Route exact path="/exercises/animation" component={Animations}/>
                         <Route exact path="/exercises/tspanimation">
-                            <ResponsiveNetworkAnimation solution={[]} weights={[[]]} test={true}/>
+                            <ResponsiveNetworkAnimation solutions={[]} solution={[]} weights={[[]]} test={true}/>
                         </Route>
                         <Route exact path='/exercises' component={ExerciseView}/>
                         <Route exact path="/exercises/scales" component={ScalesExercise}/>

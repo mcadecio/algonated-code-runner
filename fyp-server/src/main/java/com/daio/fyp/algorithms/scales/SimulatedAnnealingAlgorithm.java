@@ -2,11 +2,13 @@ package com.daio.fyp.algorithms.scales;
 
 import com.daio.fyp.random.UniformRandomGenerator;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class SimulatedAnnealingAlgorithm implements Algorithm<Solution> {
 
     private final UniformRandomGenerator randomGenerator = new UniformRandomGenerator();
+    private final List<List<Integer>> solutions = new ArrayList<>();
 
     @Override
     public Solution run(List<Double> weights, int iterations) {
@@ -20,10 +22,15 @@ public class SimulatedAnnealingAlgorithm implements Algorithm<Solution> {
         for (int i = 0; i < iterations; i++) {
             finalSolution = calculateNewSolution(weights, temperature, finalSolution);
             temperature = coolingRate * temperature;
+            solutions.add(finalSolution.getSolution());
         }
 
-
         return finalSolution;
+    }
+
+    @Override
+    public List<List<Integer>> getSolutions() {
+        return solutions;
     }
 
     private Solution calculateNewSolution(List<Double> weights, double temperature, Solution finalSolution) {

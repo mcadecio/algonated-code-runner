@@ -143,8 +143,33 @@ const ScaleLabel = ({leftRectangleWidth, rightRectangleWidth}) => {
     );
 };
 
-const BalanceAnimation = ({solution, weights}) => {
-    const {left, right} = SimpleWidthCalculator({solution, weights});
+const BalanceAnimation = ({solution, weights, solutions}) => {
+    const [{left, right}, setLeftRight] = useState(SimpleWidthCalculator({solution, weights}));
+
+    const updateLeftRight = (newLeft, newRight) => {
+        setLeftRight({
+            left: newLeft,
+            right: newRight
+        });
+    };
+
+    useEffect(() => {
+        if (solutions.length !== 0) {
+
+            const replay = async () => {
+                const delay = ms => new Promise(res => setTimeout(res, ms));
+
+                for (let i = 0; i < solutions.length; i++) {
+                    let newWidth = SimpleWidthCalculator({solution: solutions[i], weights});
+                    updateLeftRight(newWidth.left, newWidth.right);
+                    await delay(1);
+                }
+
+            };
+
+            replay();
+        }
+    }, [solutions, weights]);
 
     return (
         <BalanceScale
@@ -157,32 +182,24 @@ const BalanceAnimation = ({solution, weights}) => {
 
 const SimpleWidthCalculator = ({solution, weights}) => {
     const randomStart = Math.floor(Math.random() * Math.floor(1000));
-    const [{left, right}, updateWidth] = useState({
-        left: randomStart,
-        right: Math.abs(randomStart - 1000)
-    });
+    let left = randomStart;
+    let right = Math.abs(randomStart - 1000);
 
+    let sumOfWeightsOnTheLeft = 0;
+    let sumOfWeightsOnTheRight = 0;
 
-    useEffect(() => {
-        let sumOfWeightsOnTheLeft = 0;
-        let sumOfWeightsOnTheRight = 0;
-
-        for (let i = 0; i < solution.length; i++) {
-            if (solution[i] === 0) {
-                sumOfWeightsOnTheLeft = sumOfWeightsOnTheLeft + weights[i];
-            } else {
-                sumOfWeightsOnTheRight = sumOfWeightsOnTheRight + weights[i];
-            }
+    for (let i = 0; i < solution.length; i++) {
+        if (solution[i] === 0) {
+            sumOfWeightsOnTheLeft = sumOfWeightsOnTheLeft + weights[i];
+        } else {
+            sumOfWeightsOnTheRight = sumOfWeightsOnTheRight + weights[i];
         }
+    }
 
-        if (sumOfWeightsOnTheRight !== 0 || sumOfWeightsOnTheLeft !== 0) {
-            updateWidth({
-                left: sumOfWeightsOnTheLeft,
-                right: sumOfWeightsOnTheRight
-            });
-        }
-
-    }, [solution, weights]);
+    if (sumOfWeightsOnTheRight !== 0 || sumOfWeightsOnTheLeft !== 0) {
+        left = sumOfWeightsOnTheLeft;
+        right = sumOfWeightsOnTheRight;
+    }
 
     return {left, right};
 };

@@ -92,35 +92,16 @@ const monacoEditorConfig = () => {
         fontFamily: 'SourceCodePro, monospace',
         fontSize: 15,
         wordWrap: 'on',
-        autoSaveNamespace: 'hr-cedit-contest:1-challenge:13581',
-        compile_button_text: 'Run Code',
-        defaultLanguage: null,
-        dynamicMode: true,
-        enableIntellisense: true,
-        enableLiveAutocomplete: true,
-        enableLiveAutocompleteLinting: false,
-        enableTrackTyping: true,
-        enableVersioning: true,
-        enablePositionInfo: true,
-        foldCode: true,
-        inReact: true,
-        languages: ['c', 'clojure', 'cpp', 'cpp14', 'csharp', 'erlang', 'java'],
-        showCompileTest: true,
-        showCustomInput: true,
-        showFullScreen: true,
-        showSubmit: true,
         showUnused: true,
+        scrollBeyondLastLine: false,
+        renderWhitespace: 'boundary',
         autoIndent: 'full',
-        showUploadCode: true,
-        automaticLayout: true,
-        versionIds: [],
-        versioningRestUrl: '/rest/contests/master/challenges/2d-array/versions'
+        automaticLayout: true
     }
 }
 const MyMonacoEditor = () => {
 
     const [editorValue, setValue] = useState('{}');
-
 
     return (
         <div style={{border: 'solid 1px', width: '803px', height: '300px'}}>

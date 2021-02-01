@@ -1,8 +1,11 @@
 package com.daio.fyp.algorithms.scales;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class RandomHillClimbingAlgorithm implements Algorithm<Solution> {
+
+    private final List<List<Integer>> solutions = new ArrayList<>();
 
     @Override
     public Solution run(List<Double> weights, int iterations) {
@@ -26,9 +29,14 @@ public class RandomHillClimbingAlgorithm implements Algorithm<Solution> {
                 break;
             }
 
+            solutions.add(currentSolution.getSolution());
         }
 
         return currentSolution;
     }
 
+    @Override
+    public List<List<Integer>> getSolutions() {
+        return solutions;
+    }
 }

@@ -1,4 +1,6 @@
 import React from 'react';
+import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
+import Tooltip from 'react-bootstrap/Tooltip';
 
 const fillColor = 'rgb(97, 205, 187)';
 const outlineColor = 'rgb(73,154,141)';
@@ -7,7 +9,8 @@ const svgHeight = 500;
 
 const Graph = ({nodes, links}) => {
     return (
-        <svg x="0px" y="0px" viewBox={`0 0 ${svgWidth} ${svgHeight}`} style={{enableBackground: `new 0 0 ${svgWidth} ${svgHeight}`}}
+        <svg x="0px" y="0px" viewBox={`0 0 ${svgWidth} ${svgHeight}`}
+             style={{enableBackground: `new 0 0 ${svgWidth} ${svgHeight}`}}
              xmlSpace="preserve">
             {links.map(link => {
                 let sourceNode = nodes.find(node => node.id === link.source);
@@ -21,7 +24,7 @@ const Graph = ({nodes, links}) => {
                              sourceNode={sourceNode}
                              targetNode={targetNode}/>;
             })}
-            {nodes.map(node => <Node key={node.id} x={node.x} y={node.y}/>)}
+            {nodes.map(node => <Node name={node.id} key={node.id} x={node.x} y={node.y}/>)}
         </svg>
     );
 };
@@ -40,17 +43,26 @@ const Edge = ({sourceNode, targetNode}) => {
     );
 };
 
-const Node = ({x, y}) => {
+const Node = ({name, x, y}) => {
     return (
-        <g>
-            <circle cx={x}
-                    cy={y}
-                    r={8}
-                    fill={fillColor}
-                    scale={3}
-                    stroke={outlineColor}
-                    strokeWidth={1}/>
-        </g>
+        <OverlayTrigger
+            key={`${x}/${y}`}
+            placement="top"
+            overlay={
+                <Tooltip id={`tooltip-${x}/${y}`}>
+                    <strong>{name}</strong>
+                </Tooltip>
+            }>
+            <g>
+                <circle cx={x}
+                        cy={y}
+                        r={8}
+                        fill={fillColor}
+                        scale={3}
+                        stroke={outlineColor}
+                        strokeWidth={1}/>
+            </g>
+        </OverlayTrigger>
     );
 };
 
@@ -99,4 +111,4 @@ const createSequentialEdges = (nEdges) => {
 };
 
 
-export {Edge, Node, Graph, createMixedSpiralNodes, createSequentialEdges}
+export {Edge, Node, Graph, createMixedSpiralNodes, createSequentialEdges};

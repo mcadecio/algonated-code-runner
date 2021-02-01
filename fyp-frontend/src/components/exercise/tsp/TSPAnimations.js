@@ -5,7 +5,7 @@ import {createMixedSpiralNodes, Graph} from './GraphComponents';
 
 const delay = ms => new Promise(res => setTimeout(res, ms));
 
-const ResponsiveNetworkAnimation = ({solution, weights, test = false}) => {
+const ResponsiveNetworkAnimation = ({solution, weights: distances, test = false}) => {
     let nodes = Nodes();
     let links = Links();
 
@@ -14,7 +14,7 @@ const ResponsiveNetworkAnimation = ({solution, weights, test = false}) => {
     return (
         <div>
             <Button variant={'light'} disabled={animationRunning}
-                    onClick={() => triggerAnimation(solution, weights, setRunning, links, nodes)}>
+                    onClick={() => triggerAnimation(solution, distances, setRunning, links, nodes)}>
                 Run Animation
             </Button>
             <div style={{height: '700px'}}>
@@ -29,17 +29,20 @@ const ResponsiveNetworkAnimation = ({solution, weights, test = false}) => {
             {test && <DebugOptions nodes={nodes} links={links}/>}
         </div>
     );
-}
+};
 
-const FixedNetworkAnimation = ({solution, weights}) => {
+const FixedNetworkAnimation = ({solution, weights: distances, solutions}) => {
     let links = Links();
 
     let [animationRunning, setRunning] = useState(false);
 
+    const [fitness, setFitness] = useState(calculateFitness(solution, distances));
+
     return (
         <div>
+            <div>Fitness: {fitness}</div>
             <Button variant={'light'} disabled={animationRunning}
-                    onClick={() => triggerLinkAnimation(solution, weights, setRunning, links)}>
+                    onClick={() => triggerLinkAnimation(solution, distances, setRunning, links, solutions, setFitness)}>
                 Run Animation
             </Button>
             <div>
@@ -49,6 +52,27 @@ const FixedNetworkAnimation = ({solution, weights}) => {
     );
 };
 
+const calculateFitness = (solution, distances) => {
+    let numberOfCities = solution.length;
+
+    if (numberOfCities === 0) {
+        return -1;
+    }
+
+    let sum = 0;
+    for (let i = 0; i < numberOfCities - 1; i++) {
+        let city = solution[i];
+        let nextCity = solution[i + 1];
+        sum = sum + distances[city][nextCity];
+    }
+
+    let endCity = solution[numberOfCities - 1];
+    let startCity = solution[0];
+
+    sum = sum + distances[endCity][startCity];
+
+    return sum;
+}
 
 const MyResponsiveNetwork = ({nodes, links}) => {
     return (
@@ -139,10 +163,15 @@ const Links = () => {
         });
     };
 
+    const replace = (newLinks) => {
+        setLinks(newLinks);
+    }
+
     return {
         links,
         addLinks,
         reset,
+        replace,
         count: counter.count
     };
 };
@@ -248,22 +277,39 @@ const DebugOptions = ({nodes, links}) => {
 };
 
 
-const triggerAnimation = async (solution, weights, setRunning, links, nodes) => {
+const triggerAnimation = async (solution, distances, setRunning, links, nodes) => {
     setRunning(true);
     links.reset();
     nodes.reset();
-    if (solution.length === weights.length && solution.length === weights[0].length) {
-        await createNodes(nodes.addNode, solution)
-        await createLinks(links.addLinks, solution, weights)
+    if (solution.length === distances.length && solution.length === distances[0].length) {
+        await createNodes(nodes.addNode, solution);
+        await createLinks(links.addLinks, solution, distances);
     }
     setRunning(false);
 };
 
-const triggerLinkAnimation = async (solution, weights, setRunning, links) => {
+const triggerLinkAnimation = async (solution, distances, setRunning, links, solutions, setFitness) => {
     setRunning(true);
     links.reset();
-    if (solution.length === weights.length && solution.length === weights[0].length) {
-        await createLinks(links.addLinks, solution, weights)
+    if (solution.length === distances.length && solution.length === distances[0].length) {
+        if (solutions.length !== 0) {
+            await createLinks(links.addLinks, solutions[0], distances);
+            for (let i = 1; i < solutions.length; i++) {
+                let newLinks = [];
+                const addLinks = (city, nextCity, distance) => {
+                    newLinks.push({
+                        source: city,
+                        target: nextCity,
+                        distance
+                    })
+                }
+                await createLinks(addLinks, solutions[i], distances, 0);
+                setFitness(calculateFitness(solutions[i], distances))
+                links.replace(newLinks);
+            }
+        } else {
+            await createLinks(links.addLinks, solution, distances);
+        }
     }
     setRunning(false);
 };
@@ -279,17 +325,17 @@ const createNodes = async (addNode, solution) => {
         addNode(i, thisColor);
         await delay(100);
     }
-}
+};
 
-const createLinks = async (addLinks, solution, weights) => {
+const createLinks = async (addLinks, solution, distances, timeout = 200) => {
     for (let i = 0; i < solution.length - 1; i++) {
         let city = solution[i];
         let nextCity = solution[i + 1];
-        let distance = weights[city][nextCity];
+        let distance = distances[city][nextCity];
         addLinks(city, nextCity, distance);
-        await delay(200);
+        await delay(timeout);
     }
-}
+};
 
 const SimpleResponsiveNetworkGraph = ({links, solution}) => {
     const nodes = createMixedSpiralNodes(solution.length);
@@ -299,4 +345,4 @@ const SimpleResponsiveNetworkGraph = ({links, solution}) => {
     );
 };
 
-export {FixedNetworkAnimation, SimpleResponsiveNetworkGraph, ResponsiveNetworkAnimation}
+export {FixedNetworkAnimation, SimpleResponsiveNetworkGraph, ResponsiveNetworkAnimation};

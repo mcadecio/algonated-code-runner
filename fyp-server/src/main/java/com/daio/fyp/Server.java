@@ -2,12 +2,10 @@ package com.daio.fyp;
 
 import com.daio.fyp.response.Response;
 import com.daio.fyp.runner.CodeOptions;
-import com.daio.fyp.runner.CodeRunner;
 import com.daio.fyp.runner.CodeRunnerSummary;
-import com.daio.fyp.runner.calculator.ScalesEfficiencyCalculator;
-import com.daio.fyp.runner.calculator.ScalesFitnessCalculator;
-import com.daio.fyp.runner.calculator.TSPEfficiencyCalculator;
-import com.daio.fyp.runner.calculator.TSPFitnessCalculator;
+import com.daio.fyp.runner.ScalesCodeRunner;
+import com.daio.fyp.runner.TSPCodeRunner;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Handler;
@@ -31,6 +29,7 @@ public class Server extends AbstractVerticle {
     private static final Gson gson = new Gson();
 
     private HttpServer httpServer;
+    private ObjectMapper mapper = new ObjectMapper();
 
     @Override
     public void start(Promise<Void> startPromise) {
@@ -79,15 +78,15 @@ public class Server extends AbstractVerticle {
 
     private void handleFailure(RoutingContext rc) {
         logger.error("Error", rc.failure());
-        var response = new Response(
-                false,
-                rc.failure().getMessage() == null ?
-                        "Null Pointer Exception, Please review your code and try again" :
-                        rc.failure().getMessage(),
-                Collections.emptyList(),
-                rc.getBodyAsJson().getJsonArray("data").getList(),
-                new CodeRunnerSummary()
-        );
+        var response = new Response()
+                .setSuccess(false)
+                .setConsoleOutput(
+                        rc.failure().getMessage() == null ?
+                                "Null Pointer Exception, Please review your code and try again" :
+                                rc.failure().getMessage()
+                ).setResult(Collections.emptyList())
+                .setData(rc.getBodyAsJson().getJsonArray("data").getList())
+                .setSummary(new CodeRunnerSummary());
 
         rc.response().setChunked(true).end(gson.toJson(response));
     }
@@ -119,60 +118,65 @@ public class Server extends AbstractVerticle {
     }
 
     private void handleTSPRequest(RoutingContext rc) {
-        final String prettyRequest = rc.getBodyAsJson().encodePrettily();
-        logger.info("This was the code submitted -> \n{}", prettyRequest);
+        Timer.runTimedTask(() -> {
+            final String prettyRequest = rc.getBodyAsJson().encodePrettily();
+            logger.info("This was the code submitted -> \n{}", prettyRequest);
 
-        final CodeOptions codeOptions = gson.fromJson(prettyRequest, CodeOptions.class);
-        codeOptions.<List<List<Double>>, double[][]>setModifier(list ->
-                list.stream().map(listOfList -> listOfList.stream()
-                        .mapToDouble(Double::doubleValue)
-                        .toArray()).toArray(double[][]::new));
-        final CodeRunner codeRunner = new CodeRunner(codeOptions);
+            final CodeOptions codeOptions = gson.fromJson(prettyRequest, CodeOptions.class);
 
-        codeRunner.compile();
-        final List<Integer> result = codeRunner.execute();
-        CodeRunnerSummary summary = codeRunner.getSummary(
-                new TSPFitnessCalculator(),
-                new TSPEfficiencyCalculator(),
-                (double[][]) codeOptions.getModifier().apply(codeOptions.getData()),
-                result
-        );
+            List<List<Double>> data = gson.<List<List<Double>>>fromJson(
+                    rc.getBodyAsJson()
+                            .getJsonArray("data")
+                            .encode(), List.class);
 
-        var response = new Response(
-                codeRunner.isSuccess(),
-                codeRunner.getErrorMessage(),
-                result,
-                codeOptions.getData(),
-                summary
-        );
-        rc.response().setChunked(true).end(gson.toJson(response));
+            final TSPCodeRunner codeRunner = Timer.runTimedTask(
+                    () -> new TSPCodeRunner(codeOptions, data).compile().execute(),
+                    "TSP Code Runner"
+            );
+
+            var response = codeRunner.toResponse();
+
+            String chunk = Timer.runTimedTaskWithException(
+                    () -> mapper.writeValueAsString(response),
+                    "Mapper timer",
+                    "{}"
+            );
+
+            rc.response().setChunked(true).end(chunk);
+        }, "TSP Request");
     }
 
     private void handleScalesRequest(RoutingContext rc) {
-        final String prettyRequest = rc.getBodyAsJson().encodePrettily();
-        logger.debug("This was the code submitted -> \n{}", prettyRequest);
+        Timer.runTimedTask(() -> {
+            final String prettyRequest = rc.getBodyAsJson().encodePrettily();
+            logger.debug("This was the code submitted -> \n{}", prettyRequest);
 
-        final CodeOptions codeOptions = gson.fromJson(prettyRequest, CodeOptions.class);
+            final CodeOptions codeOptions = gson.fromJson(prettyRequest, CodeOptions.class);
 
-        final CodeRunner codeRunner = new CodeRunner(codeOptions);
+            List<Double> data = gson.<List<Double>>fromJson(
+                    rc.getBodyAsJson()
+                            .getJsonArray("data")
+                            .encode(),
+                    List.class
+            );
 
-        codeRunner.compile();
-        final List<Integer> result = codeRunner.execute();
-        CodeRunnerSummary summary = codeRunner.getSummary(
-                new ScalesFitnessCalculator(),
-                new ScalesEfficiencyCalculator(),
-                (List<Double>) codeOptions.getData(),
-                result
-        );
+            final ScalesCodeRunner codeRunner = Timer.runTimedTask(
+                    () -> new ScalesCodeRunner(codeOptions, data).compile().execute(),
+                    "Code Runner"
+            );
 
-        var response = new Response(
-                codeRunner.isSuccess(),
-                codeRunner.getErrorMessage(),
-                result,
-                codeOptions.getData(),
-                summary
-        );
-        rc.response().setChunked(true).end(gson.toJson(response));
+            Response response = codeRunner.toResponse();
+
+            String chunk = Timer.runTimedTaskWithException(
+                    () -> mapper.writeValueAsString(response),
+                    "Mapper timer",
+                    "{}"
+            );
+
+            rc.response().setChunked(true).end(chunk);
+
+        }, "Scales Request");
+
     }
 
     @Override

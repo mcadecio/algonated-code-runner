@@ -4,5 +4,6 @@ import java.util.List;
 
 public interface Algorithm<T> {
     T run(List<Double> weights, int iterations);
+    List<List<Integer>> getSolutions();
 }
 
