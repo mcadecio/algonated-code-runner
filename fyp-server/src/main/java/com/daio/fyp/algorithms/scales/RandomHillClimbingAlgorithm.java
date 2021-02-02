@@ -3,7 +3,7 @@ package com.daio.fyp.algorithms.scales;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RandomHillClimbingAlgorithm implements Algorithm<Solution> {
+public class RandomHillClimbingAlgorithm implements Algorithm<Solution, List<Double>> {
 
     private final List<List<Integer>> solutions = new ArrayList<>();
 
@@ -26,6 +26,7 @@ public class RandomHillClimbingAlgorithm implements Algorithm<Solution> {
 
             if (newFitness == 0) {
                 currentSolution = newSolution.copy();
+                solutions.add(currentSolution.getSolution());
                 break;
             }
 

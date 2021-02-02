@@ -1,11 +1,17 @@
 package com.daio.fyp.algorithms.tsp;
 
+import com.daio.fyp.algorithms.scales.Algorithm;
 import com.daio.fyp.random.UniformRandomGenerator;
 
-public class SimulatedAnnealingAlgorithm {
+import java.util.ArrayList;
+import java.util.List;
+
+public class SimulatedAnnealingAlgorithm implements Algorithm<TSPSolution, double[][]> {
 
     private final UniformRandomGenerator randomGenerator = new UniformRandomGenerator();
+    private final List<List<Integer>> solutions = new ArrayList<>();
 
+    @Override
     public TSPSolution run(double[][] distances, int iterations) {
         System.out.println("Running SA");
 
@@ -16,11 +22,17 @@ public class SimulatedAnnealingAlgorithm {
 
         for (int i = 0; i < iterations; i++) {
             finalSolution = calculateNewSolution(distances, temperature, finalSolution);
+            solutions.add(finalSolution.getSolution());
             temperature = coolingRate * temperature;
         }
 
 
         return finalSolution;
+    }
+
+    @Override
+    public List<List<Integer>> getSolutions() {
+        return solutions;
     }
 
     private TSPSolution calculateNewSolution(double[][] distances, double temperature, TSPSolution finalSolution) {

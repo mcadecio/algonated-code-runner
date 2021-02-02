@@ -5,7 +5,7 @@ import com.daio.fyp.random.UniformRandomGenerator;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SimulatedAnnealingAlgorithm implements Algorithm<Solution> {
+public class SimulatedAnnealingAlgorithm implements Algorithm<Solution, List<Double>> {
 
     private final UniformRandomGenerator randomGenerator = new UniformRandomGenerator();
     private final List<List<Integer>> solutions = new ArrayList<>();

@@ -5,6 +5,9 @@ import com.daio.fyp.runner.CodeOptions;
 import com.daio.fyp.runner.CodeRunnerSummary;
 import com.daio.fyp.runner.ScalesCodeRunner;
 import com.daio.fyp.runner.TSPCodeRunner;
+import com.daio.fyp.runner.demo.DemoRequest;
+import com.daio.fyp.runner.demo.ScalesRunner;
+import com.daio.fyp.runner.demo.TSPRunner;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import io.vertx.core.AbstractVerticle;
@@ -48,6 +51,17 @@ public class Server extends AbstractVerticle {
         router.post("/exercise/submit/scales").handler(rc -> {
             rc.vertx().executeBlocking(promise -> {
                 handleScalesRequest(rc);
+                promise.complete();
+            }, result -> {
+                if (result.failed()) {
+                    rc.fail(result.cause());
+                }
+            });
+        });
+
+        router.post("/exercise/demo").handler(rc -> {
+            rc.vertx().executeBlocking(promise -> {
+                handleDemoRequest(rc);
                 promise.complete();
             }, result -> {
                 if (result.failed()) {
@@ -176,6 +190,45 @@ public class Server extends AbstractVerticle {
             rc.response().setChunked(true).end(chunk);
 
         }, "Scales Request");
+
+    }
+
+    private void handleDemoRequest(RoutingContext rc) {
+        Timer.runTimedTask(() -> {
+            final String prettyRequest = rc.getBodyAsJson().encodePrettily();
+            logger.debug("This was the request submitted -> \n{}", prettyRequest);
+
+            Response response;
+            if (rc.getBodyAsJson().getString("problem").equals("scales")) {
+                DemoRequest<List<Double>> request = gson.<DemoRequest<List<Double>>>fromJson(prettyRequest, DemoRequest.class);
+                response = new ScalesRunner(request).run().toResponse();
+            } else if (rc.getBodyAsJson().getString("problem").equals("tsp")) {
+                DemoRequest<double[][]> request = gson.<DemoRequest<double[][]>>fromJson(prettyRequest, DemoRequest.class);
+                request.setData(gson.<List<List<Double>>>fromJson(rc.getBodyAsJson().getJsonArray("data").encode(), List.class)
+                        .stream().map(listOfList -> listOfList.stream()
+                                .mapToDouble(Double::doubleValue)
+                                .toArray()).toArray(double[][]::new));
+                response = new TSPRunner(request).run().toResponse();
+            } else {
+                response = new Response()
+                        .setSuccess(false)
+                        .setSolutions(Collections.emptyList())
+                        .setConsoleOutput("I didn't understand your request")
+                        .setResult(Collections.emptyList())
+                        .setData(Collections.emptyList())
+                        .setSummary(new CodeRunnerSummary());
+            }
+
+
+            String chunk = Timer.runTimedTaskWithException(
+                    () -> mapper.writeValueAsString(response),
+                    "Mapper timer",
+                    "{}"
+            );
+
+            rc.response().setChunked(true).end(chunk);
+
+        }, "Demo Request");
 
     }
 

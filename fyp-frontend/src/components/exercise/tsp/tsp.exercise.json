@@ -29,6 +29,8 @@
       "System\\.exit\\(.*\\);"
     ],
     "code": "",
-    "endpoint": "/exercise/submit/tsp"
+    "endpoint": "/exercise/submit/tsp",
+    "demoEndpoint": "/exercise/demo",
+    "problem": "tsp"
   }
 }

@@ -10,6 +10,7 @@ import ListGroup from 'react-bootstrap/ListGroup';
 import Button from 'react-bootstrap/Button';
 import Spinner from 'react-bootstrap/Spinner';
 import Nav from 'react-bootstrap/Nav';
+import ButtonGroup from 'react-bootstrap/ButtonGroup';
 
 function ExercisePage({problem}) {
     return (
@@ -40,6 +41,38 @@ const TheWholePage = ({exercise, animation}) => {
             efficacy: 0
         }
     });
+
+    const runDemo = (algorithm) => {
+        setLoading(true);
+        const request = {
+            problem: exercise.problem,
+            algorithm,
+            data: JSON.parse(exerciseData).data,
+            iterations: Number.parseInt(iterations, 10)
+        };
+        console.debug({request});
+        let endpoint = `${process.env.REACT_APP_FYP_SERVER_DOMAIN}/exercise/demo`;
+
+        if (process.env.NODE_ENV === 'development') {
+            console.debug(process.env.NODE_ENV);
+            endpoint = `http://localhost:80/exercise/demo`;
+        }
+        fetch(endpoint, {
+            method: 'POST',
+            body: JSON.stringify(request),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(res => {
+            return res.json();
+        }).then(requestResult => {
+            console.debug(requestResult);
+            setConsoleOutput(requestResult);
+            alert.setShow(!requestResult.isSuccess);
+        }).finally(() => {
+            setLoading(false);
+        });
+    };
 
     const sendCodeToServer = (value) => {
         setLoading(true);
@@ -83,7 +116,9 @@ const TheWholePage = ({exercise, animation}) => {
                         iterations={iterations}
                         setIterations={setIterations}
                         data={exerciseData}
-                        setData={setExerciseData}/>
+                        setData={setExerciseData}
+                        demoCallback={runDemo}
+                    />
                     <SubmitCodeButton
                         isLoading={isLoading}
                         callback={() => sendCodeToServer(code)}
@@ -104,7 +139,7 @@ const TheWholePage = ({exercise, animation}) => {
     );
 };
 
-const ExerciseCodingArea = ({code, setCode, iterations, setIterations, data, setData}) => {
+const ExerciseCodingArea = ({code, setCode, iterations, setIterations, data, setData, demoCallback}) => {
 
     const map = new Map();
     map.set('#iterations', (
@@ -119,6 +154,19 @@ const ExerciseCodingArea = ({code, setCode, iterations, setIterations, data, set
 
     map.set('#editor', (
         <MonacoExerciseEditor code={code} setCode={setCode} language={'java'}/>
+    ));
+
+    map.set('#demo', (
+        <Card.Body>
+            <Card.Text className={'d-flex justify-content-center'}>
+                Click on one of the algorithms below to run those
+                algorithms
+            </Card.Text>
+            <ButtonGroup className={'d-flex justify-content-center'}>
+                <Button variant="secondary" onClick={() => demoCallback('randomhillclimbing')}>Random Hill Climbing</Button>
+                <Button variant="secondary" onClick={() => demoCallback('simulatedannealing')}>Simulated Annealing</Button>
+            </ButtonGroup>
+        </Card.Body>
     ));
 
     const [selected, setSelected] = useState(map.get('#editor'));
@@ -153,6 +201,9 @@ const CodingTabs = ({changeTab}) => {
                 </Nav.Item>
                 <Nav.Item>
                     <Nav.Link href="#data">Data</Nav.Link>
+                </Nav.Item>
+                <Nav.Item>
+                    <Nav.Link href="#demo">Demo</Nav.Link>
                 </Nav.Item>
             </Nav>
         </Card.Header>
