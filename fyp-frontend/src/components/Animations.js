@@ -1,7 +1,6 @@
-import React, {useEffect, useRef, useState} from 'react';
-import {anime} from 'react-anime';
+import React, {useEffect, useState} from 'react';
 import '../App.css';
-import './anime.css';
+import './anime.css'
 import {createMixedSpiralNodes, createSequentialEdges, Graph} from './exercise/tsp/GraphComponents';
 
 const styles = {
@@ -67,70 +66,6 @@ const ChargedAnimation = () => {
                 </pre>
         </div>
     );
-};
-
-// eslint-disable-next-line
-const Animation = () => {
-    const animationRef = useRef(null);
-    useEffect(() => {
-        animationRef.current = anime({
-            targets: '.el',
-            keyframes: [
-                {translateY: -40},
-                {translateX: 250},
-                {translateY: 40},
-                {translateX: 0},
-                {translateY: 0}
-            ],
-            delay: function (el, i) {
-                return i * 100;
-            },
-            loop: false,
-            easing: 'easeInOutSine'
-        });
-    });
-    return (
-        <div className="App">
-            <button onClick={() => animationRef.current.restart()}>Restart</button>
-            <div className="el" style={{...styles.bar, height: 500, background: 'red'}}/>
-        </div>
-    );
-
-};
-
-// eslint-disable-next-line
-const ChargedAnimationAnimeJS = () => {
-    const animationRef = useRef(null);
-
-    let battery = {
-        charged: '0%',
-        cycles: 500
-    };
-
-    useEffect(() => {
-        animationRef.current = anime({
-            targets: battery,
-            charged: '100%',
-            cycles: 15,
-            round: 1,
-            easing: 'linear',
-            update: function () {
-                try {
-                    document.querySelector('.el').innerHTML = JSON.stringify(battery);
-                } catch {
-                    console.debug('interrupted');
-                }
-            }
-        });
-        // eslint-disable-next-line
-    }, []);
-    return (
-        <div className="App">
-            <button onClick={() => animationRef.current.restart()}>Restart</button>
-            <div className="el"/>
-        </div>
-    );
-
 };
 
 const MyOwnNetworkGraph = () => {

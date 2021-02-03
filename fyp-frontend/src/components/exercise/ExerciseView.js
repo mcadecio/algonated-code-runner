@@ -25,19 +25,7 @@ const ExerciseView = () => {
             imgLocation: tsp.imgLocation,
             title: tsp.name,
             text: tsp.description.join(' ')
-        }, {
-            key: 'animation',
-            id: 'animation',
-            imgLocation: holderImage,
-            title: 'Many Random Animations',
-            text: 'This section is really just a place holder for me to play with animations'
-        }, {
-            key: 'tspanimation',
-            id: 'tspanimation',
-            imgLocation: holderImage,
-            title: 'The TSP Animation',
-            text: 'Add and remove nodes to the network at your disposal'
-        },
+        }
     ];
 
     return (

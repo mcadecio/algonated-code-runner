@@ -307,6 +307,7 @@ const triggerLinkAnimation = async (solution, distances, setRunning, links, solu
                 setFitness(calculateFitness(solutions[i], distances))
                 links.replace(newLinks);
             }
+
         } else {
             await createLinks(links.addLinks, solution, distances);
         }

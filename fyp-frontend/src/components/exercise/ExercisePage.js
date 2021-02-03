@@ -11,11 +11,12 @@ import Button from 'react-bootstrap/Button';
 import Spinner from 'react-bootstrap/Spinner';
 import Nav from 'react-bootstrap/Nav';
 import ButtonGroup from 'react-bootstrap/ButtonGroup';
+import '../anime.css';
 
 function ExercisePage({problem}) {
     return (
         <div style={{marginLeft: '2%', marginRight: '2%'}}>
-            <ExerciseProblem name={problem.name} description={problem.description}/>
+            <ExerciseProblem name={problem.name} description={problem.customDescription}/>
             <br/>
             <TheWholePage exercise={problem.exercise} animation={problem.animation}/>
         </div>
@@ -24,7 +25,7 @@ function ExercisePage({problem}) {
 
 const TheWholePage = ({exercise, animation}) => {
     const alert = DangerDismissibleAlert({innerText: 'It looks like something went wrong, check the output !'});
-    const [code, setCode] = useState(exercise.defaultStarterCode.join(' '));
+    const [code, setCode] = useState(exercise.defaultStarterCode);
     const [isLoading, setLoading] = useState(false);
     const [iterations, setIterations] = useState(exercise.iterations.toString());
     const [exerciseData, setExerciseData] = useState(JSON.stringify({data: exercise.data}, null, 2));
