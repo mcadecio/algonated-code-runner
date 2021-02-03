@@ -29,10 +29,10 @@ public class Server extends AbstractVerticle {
 
     private static final Logger logger = LoggerFactory.getLogger(Server.class);
 
-    private static final Gson gson = new Gson();
+    private final Gson gson = new Gson();
+    private final ObjectMapper mapper = new ObjectMapper();
 
     private HttpServer httpServer;
-    private ObjectMapper mapper = new ObjectMapper();
 
     @Override
     public void start(Promise<Void> startPromise) {
@@ -48,38 +48,20 @@ public class Server extends AbstractVerticle {
 
         router.get("/hello").handler(rc -> rc.response().end("Hello, World!"));
 
-        router.post("/exercise/submit/scales").handler(rc -> {
-            rc.vertx().executeBlocking(promise -> {
-                handleScalesRequest(rc);
-                promise.complete();
-            }, result -> {
-                if (result.failed()) {
-                    rc.fail(result.cause());
-                }
-            });
+        router.post("/exercise/submit/").handler(rc -> {
+            final String prettyRequest = rc.getBodyAsJson().encodePrettily();
+            logger.info("This was the code submitted -> \n{}", prettyRequest);
+            rc.next();
         });
 
-        router.post("/exercise/demo").handler(rc -> {
-            rc.vertx().executeBlocking(promise -> {
-                handleDemoRequest(rc);
-                promise.complete();
-            }, result -> {
-                if (result.failed()) {
-                    rc.fail(result.cause());
-                }
-            });
-        });
+        router.post("/exercise/submit/scales")
+                .handler(rc -> executeBlocking(() -> handleScalesRequest(rc), rc));
 
-        router.post("/exercise/submit/tsp").handler(rc -> {
-            rc.vertx().executeBlocking(promise -> {
-                handleTSPRequest(rc);
-                promise.complete();
-            }, result -> {
-                if (result.failed()) {
-                    rc.fail(result.cause());
-                }
-            });
-        });
+        router.post("/exercise/demo")
+                .handler(rc -> executeBlocking(() -> handleDemoRequest(rc), rc));
+
+        router.post("/exercise/submit/tsp")
+                .handler(rc -> executeBlocking(() -> handleTSPRequest(rc), rc));
 
         httpServer = vertx.createHttpServer();
         httpServer
@@ -133,30 +115,19 @@ public class Server extends AbstractVerticle {
 
     private void handleTSPRequest(RoutingContext rc) {
         Timer.runTimedTask(() -> {
-            final String prettyRequest = rc.getBodyAsJson().encodePrettily();
-            logger.info("This was the code submitted -> \n{}", prettyRequest);
-
-            final CodeOptions codeOptions = gson.fromJson(prettyRequest, CodeOptions.class);
+            final CodeOptions codeOptions = gson.fromJson(rc.getBodyAsString(), CodeOptions.class);
 
             List<List<Double>> data = gson.<List<List<Double>>>fromJson(
                     rc.getBodyAsJson()
                             .getJsonArray("data")
                             .encode(), List.class);
 
-            final TSPCodeRunner codeRunner = Timer.runTimedTask(
+            sendResponse(rc, Timer.runTimedTask(
                     () -> new TSPCodeRunner(codeOptions, data).compile().execute(),
                     "TSP Code Runner"
-            );
+            ).toResponse());
 
-            var response = codeRunner.toResponse();
 
-            String chunk = Timer.runTimedTaskWithException(
-                    () -> mapper.writeValueAsString(response),
-                    "Mapper timer",
-                    "{}"
-            );
-
-            rc.response().setChunked(true).end(chunk);
         }, "TSP Request");
     }
 
@@ -174,20 +145,10 @@ public class Server extends AbstractVerticle {
                     List.class
             );
 
-            final ScalesCodeRunner codeRunner = Timer.runTimedTask(
+            sendResponse(rc, Timer.runTimedTask(
                     () -> new ScalesCodeRunner(codeOptions, data).compile().execute(),
                     "Code Runner"
-            );
-
-            Response response = codeRunner.toResponse();
-
-            String chunk = Timer.runTimedTaskWithException(
-                    () -> mapper.writeValueAsString(response),
-                    "Mapper timer",
-                    "{}"
-            );
-
-            rc.response().setChunked(true).end(chunk);
+            ).toResponse());
 
         }, "Scales Request");
 
@@ -195,15 +156,13 @@ public class Server extends AbstractVerticle {
 
     private void handleDemoRequest(RoutingContext rc) {
         Timer.runTimedTask(() -> {
-            final String prettyRequest = rc.getBodyAsJson().encodePrettily();
-            logger.debug("This was the request submitted -> \n{}", prettyRequest);
 
             Response response;
             if (rc.getBodyAsJson().getString("problem").equals("scales")) {
-                DemoRequest<List<Double>> request = gson.<DemoRequest<List<Double>>>fromJson(prettyRequest, DemoRequest.class);
+                DemoRequest<List<Double>> request = gson.<DemoRequest<List<Double>>>fromJson(rc.getBodyAsString(), DemoRequest.class);
                 response = new ScalesRunner(request).run().toResponse();
             } else if (rc.getBodyAsJson().getString("problem").equals("tsp")) {
-                DemoRequest<double[][]> request = gson.<DemoRequest<double[][]>>fromJson(prettyRequest, DemoRequest.class);
+                DemoRequest<double[][]> request = gson.<DemoRequest<double[][]>>fromJson(rc.getBodyAsString(), DemoRequest.class);
                 request.setData(gson.<List<List<Double>>>fromJson(rc.getBodyAsJson().getJsonArray("data").encode(), List.class)
                         .stream().map(listOfList -> listOfList.stream()
                                 .mapToDouble(Double::doubleValue)
@@ -219,17 +178,31 @@ public class Server extends AbstractVerticle {
                         .setSummary(new CodeRunnerSummary());
             }
 
-
-            String chunk = Timer.runTimedTaskWithException(
-                    () -> mapper.writeValueAsString(response),
-                    "Mapper timer",
-                    "{}"
-            );
-
-            rc.response().setChunked(true).end(chunk);
+            sendResponse(rc, response);
 
         }, "Demo Request");
 
+    }
+
+    private void sendResponse(RoutingContext rc, Response response) {
+        String chunk = Timer.runTimedTaskWithException(
+                () -> mapper.writeValueAsString(response),
+                "Mapper timer",
+                "{}"
+        );
+
+        rc.response().setChunked(true).end(chunk);
+    }
+
+    private void executeBlocking(Runnable runnable, RoutingContext rc) {
+        vertx.executeBlocking(promise -> {
+            runnable.run();
+            promise.complete();
+        }, result -> {
+            if (result.failed()) {
+                rc.fail(result.cause());
+            }
+        });
     }
 
     @Override

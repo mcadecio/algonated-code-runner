@@ -1,18 +1,21 @@
 package com.daio.fyp.algorithms.scales;
 
 import com.daio.fyp.random.UniformRandomGenerator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class SimulatedAnnealingAlgorithm implements Algorithm<Solution, List<Double>> {
 
+    private static final Logger logger = LoggerFactory.getLogger(SimulatedAnnealingAlgorithm.class);
     private final UniformRandomGenerator randomGenerator = new UniformRandomGenerator();
     private final List<List<Integer>> solutions = new ArrayList<>();
 
     @Override
     public Solution run(List<Double> weights, int iterations) {
-        System.out.println("Running SA");
+        logger.info("Running SA");
 
         double temperature = 1000;
         double coolingRate = calcCR(temperature, iterations);

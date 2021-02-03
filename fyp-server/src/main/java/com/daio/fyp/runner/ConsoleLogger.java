@@ -5,7 +5,7 @@ import java.util.List;
 
 public class ConsoleLogger {
 
-    public List<String> lines = new ArrayList<>();
+    private final List<String> lines = new ArrayList<>();
 
     public void print(String value) {
         lines.add(value);

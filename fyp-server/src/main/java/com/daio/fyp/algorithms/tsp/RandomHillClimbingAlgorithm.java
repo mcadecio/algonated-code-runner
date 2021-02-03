@@ -1,17 +1,20 @@
 package com.daio.fyp.algorithms.tsp;
 
 import com.daio.fyp.algorithms.scales.Algorithm;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class RandomHillClimbingAlgorithm implements Algorithm<TSPSolution, double[][]> {
 
+    private static final Logger logger = LoggerFactory.getLogger(RandomHillClimbingAlgorithm.class);
     private final List<List<Integer>> solutions = new ArrayList<>();
 
     @Override
     public TSPSolution run(double[][] distances, int iterations) {
-        System.out.println("Running RMHC");
+        logger.info("Running RMHC");
 
         TSPSolution currentSolution = new TSPSolution(distances.length);
 
@@ -33,8 +36,6 @@ public class RandomHillClimbingAlgorithm implements Algorithm<TSPSolution, doubl
             }
 
             solutions.add(currentSolution.getSolution());
-            System.out.println(currentSolution.calculateFitness(distances));
-
         }
 
         return currentSolution;

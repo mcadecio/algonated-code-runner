@@ -1,6 +1,5 @@
 package com.daio.fyp.runner.demo;
 
-import com.daio.fyp.Timer;
 import com.daio.fyp.algorithms.scales.Algorithm;
 import com.daio.fyp.algorithms.scales.RandomHillClimbingAlgorithm;
 import com.daio.fyp.algorithms.scales.SimulatedAnnealingAlgorithm;
@@ -47,17 +46,8 @@ public class ScalesRunner {
     private void buildSummary(long elapsed) {
         summary.setTimeRun(elapsed);
         summary.setIterations(request.getIterations());
-        Timer.runTimedTask(() -> {
-            summary.setFitness(new ScalesFitnessCalculator().calculate(request.getData(), solution));
-        }, "Fitness Calculator");
-
-        Timer.runTimedTask(() -> {
-            summary.setEfficacy(new ScalesEfficiencyCalculator().calculate(request.getData(), solution));
-        }, "Efficacy Calculator");
-    }
-
-    public CodeRunnerSummary getSummary() {
-        return summary;
+        summary.setFitness(new ScalesFitnessCalculator().calculate(request.getData(), solution));
+        summary.setEfficacy(new ScalesEfficiencyCalculator().calculate(request.getData(), solution));
     }
 
     public Response toResponse() {

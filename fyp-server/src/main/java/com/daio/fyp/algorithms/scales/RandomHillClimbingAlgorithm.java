@@ -1,15 +1,19 @@
 package com.daio.fyp.algorithms.scales;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class RandomHillClimbingAlgorithm implements Algorithm<Solution, List<Double>> {
 
+    private static final Logger logger = LoggerFactory.getLogger(RandomHillClimbingAlgorithm.class);
     private final List<List<Integer>> solutions = new ArrayList<>();
 
     @Override
     public Solution run(List<Double> weights, int iterations) {
-        System.out.println("Running RMHC");
+        logger.info("Running RMHC");
 
         Solution currentSolution = new ScalesSolution(weights.size());
 

@@ -1,6 +1,5 @@
 package com.daio.fyp.runner.demo;
 
-import com.daio.fyp.Timer;
 import com.daio.fyp.algorithms.scales.Algorithm;
 import com.daio.fyp.algorithms.tsp.RandomHillClimbingAlgorithm;
 import com.daio.fyp.algorithms.tsp.SimulatedAnnealingAlgorithm;
@@ -45,19 +44,10 @@ public class TSPRunner {
     }
 
     private void buildSummary(long elapsed) {
-        summary.setTimeRun(elapsed);
-        summary.setIterations(request.getIterations());
-        Timer.runTimedTask(() -> {
-            summary.setFitness(new TSPFitnessCalculator().calculate(request.getData(), solution));
-        }, "Fitness Calculator");
-
-        Timer.runTimedTask(() -> {
-            summary.setEfficacy(new TSPEfficiencyCalculator().calculate(request.getData(), solution));
-        }, "Efficacy Calculator");
-    }
-
-    public CodeRunnerSummary getSummary() {
-        return summary;
+        summary.setTimeRun(elapsed)
+                .setIterations(request.getIterations())
+                .setFitness(new TSPFitnessCalculator().calculate(request.getData(), solution))
+                .setEfficacy(new TSPEfficiencyCalculator().calculate(request.getData(), solution));
     }
 
     public Response toResponse() {

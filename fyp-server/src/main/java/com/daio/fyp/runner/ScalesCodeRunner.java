@@ -71,18 +71,19 @@ public class ScalesCodeRunner {
             String rawSolution = compiledClass.call(options.getMethodToCall(), weights, options.getIterations())
                     .get();
             timer.stop();
-            runnerSummary.setTimeRun(timer.elapsed(TimeUnit.MILLISECONDS));
-            runnerSummary.setIterations(options.getIterations());
+
 
             List<String> stringSolutions = compiledClass.get("solutions");
 
-            Timer.runTimedTaskWithException(() -> {
-                solutions = binaryStringToList(stringSolutions);
-            }, "getSolutions");
+            Timer.runTimedTaskWithException(
+                    () -> solutions = binaryStringToList(stringSolutions),
+                    "getSolutions"
+            );
 
             solution = transformStringToList(rawSolution);
             isSuccess = true;
             errorMessage = "Compile and Run was a success!";
+            buildSummary(timer.elapsed(TimeUnit.MILLISECONDS));
             return this;
         } catch (ReflectException reflectException) {
             handleError(reflectException.getMessage());
@@ -90,16 +91,11 @@ public class ScalesCodeRunner {
         }
     }
 
-    public CodeRunnerSummary getSummary() {
-        Timer.runTimedTask(() -> {
-            runnerSummary.setFitness(new ScalesFitnessCalculator().calculate(weights, solution));
-        }, "Fitness Calculator");
-
-        Timer.runTimedTask(() -> {
-            runnerSummary.setEfficacy(new ScalesEfficiencyCalculator().calculate(weights, solution));
-        }, "Efficacy Calculator");
-
-        return runnerSummary;
+    public void buildSummary(long elapsed) {
+        runnerSummary.setTimeRun(elapsed)
+                .setIterations(options.getIterations())
+                .setFitness(new ScalesFitnessCalculator().calculate(weights, solution))
+                .setEfficacy(new ScalesEfficiencyCalculator().calculate(weights, solution));
     }
 
     public String getErrorMessage() {
@@ -170,7 +166,7 @@ public class ScalesCodeRunner {
                 .setConsoleOutput(getErrorMessage())
                 .setResult(getSolution())
                 .setData(weights)
-                .setSummary(getSummary())
+                .setSummary(runnerSummary)
                 .setSolutions(getSolutions());
     }
 
