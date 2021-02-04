@@ -57,3 +57,7 @@
   transform-origin: center;
   transform: rotate(0deg);
 }
+
+.dark-blue-text {
+  color: rgb(0, 50, 91);
+}

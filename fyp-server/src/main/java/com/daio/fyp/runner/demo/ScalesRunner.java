@@ -28,7 +28,9 @@ public class ScalesRunner {
     public ScalesRunner run() {
         Algorithm<Solution, List<Double>> algorithm = new SimulatedAnnealingAlgorithm();
         if (request.getAlgorithm().equals("simulatedannealing")) {
-            algorithm = new SimulatedAnnealingAlgorithm();
+            algorithm = new SimulatedAnnealingAlgorithm()
+                    .setOptionalCR(request.getCoolingRate())
+                    .setOptionalTemp(request.getTemperature());
         } else if (request.getAlgorithm().equals("randomhillclimbing")) {
             algorithm = new RandomHillClimbingAlgorithm();
         }

@@ -2,6 +2,7 @@ import {ResponsiveNetwork} from '@nivo/network';
 import React, {useEffect, useState} from 'react';
 import Button from 'react-bootstrap/Button';
 import {createMixedSpiralNodes, Graph} from './GraphComponents';
+import {equals} from '../scales/ScaleAnimations';
 
 const delay = ms => new Promise(res => setTimeout(res, ms));
 
@@ -72,7 +73,7 @@ const calculateFitness = (solution, distances) => {
     sum = sum + distances[endCity][startCity];
 
     return sum;
-}
+};
 
 const MyResponsiveNetwork = ({nodes, links}) => {
     return (
@@ -165,7 +166,7 @@ const Links = () => {
 
     const replace = (newLinks) => {
         setLinks(newLinks);
-    }
+    };
 
     return {
         links,
@@ -301,11 +302,13 @@ const triggerLinkAnimation = async (solution, distances, setRunning, links, solu
                         source: city,
                         target: nextCity,
                         distance
-                    })
+                    });
+                };
+                if (!equals(solutions[i - 1], solutions[i])) {
+                    await createLinks(addLinks, solutions[i], distances, 0);
+                    setFitness(calculateFitness(solutions[i], distances));
+                    links.replace(newLinks);
                 }
-                await createLinks(addLinks, solutions[i], distances, 0);
-                setFitness(calculateFitness(solutions[i], distances))
-                links.replace(newLinks);
             }
 
         } else {

@@ -161,7 +161,9 @@ const BalanceAnimation = ({solution, weights, solutions}) => {
 
                 for (let i = 0; i < solutions.length; i++) {
                     let newWidth = SimpleWidthCalculator({solution: solutions[i], weights});
-                    updateLeftRight(newWidth.left, newWidth.right);
+                    if (i > 0 && !equals(solutions[i - 1], solutions[i])) {
+                        updateLeftRight(newWidth.left, newWidth.right);
+                    }
                     await delay(1);
                 }
 
@@ -178,6 +180,14 @@ const BalanceAnimation = ({solution, weights, solutions}) => {
             weights={weights.length}
         />
     );
+};
+
+const equals = (solution, anotherSolution) => {
+    let i = solution.length;
+    while (i--) {
+        if (solution[i] !== anotherSolution[i]) return false;
+    }
+    return true;
 };
 
 const SimpleWidthCalculator = ({solution, weights}) => {
@@ -246,4 +256,4 @@ const BalanceScale = ({left, right, weights}) => {
     );
 };
 
-export {BarAnimation, BalanceAnimation};
+export {BarAnimation, BalanceAnimation, equals};

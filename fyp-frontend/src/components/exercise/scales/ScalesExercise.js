@@ -142,7 +142,6 @@ const Instructions = () => (
             <br/>
             - <i>Demo:</i> In the Demo tab, you can run run of the existing algorithms and see how they perform.
         </Card.Text>
-
     </div>
 );
 

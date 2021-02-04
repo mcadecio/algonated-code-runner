@@ -6,6 +6,8 @@ public class DemoRequest<T> {
     private String algorithm;
     private T data;
     private int iterations;
+    private double temperature;
+    private double coolingRate;
 
     public String getProblem() {
         return problem;
@@ -40,6 +42,24 @@ public class DemoRequest<T> {
 
     public DemoRequest<T> setIterations(int iterations) {
         this.iterations = iterations;
+        return this;
+    }
+
+    public double getTemperature() {
+        return temperature;
+    }
+
+    public DemoRequest<T> setTemperature(double temperature) {
+        this.temperature = temperature;
+        return this;
+    }
+
+    public double getCoolingRate() {
+        return coolingRate;
+    }
+
+    public DemoRequest<T> setCoolingRate(double coolingRate) {
+        this.coolingRate = coolingRate;
         return this;
     }
 }

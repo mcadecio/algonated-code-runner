@@ -10,8 +10,8 @@ import ListGroup from 'react-bootstrap/ListGroup';
 import Button from 'react-bootstrap/Button';
 import Spinner from 'react-bootstrap/Spinner';
 import Nav from 'react-bootstrap/Nav';
-import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import '../anime.css';
+import ExerciseDemo from './demo/ExerciseDemo';
 
 function ExercisePage({problem}) {
     return (
@@ -43,13 +43,13 @@ const TheWholePage = ({exercise, animation}) => {
         }
     });
 
-    const runDemo = (algorithm) => {
+    const runDemo = (algorithm, extraFields) => {
         setLoading(true);
         const request = {
             problem: exercise.problem,
             algorithm,
             data: JSON.parse(exerciseData).data,
-            iterations: Number.parseInt(iterations, 10)
+            ...extraFields
         };
         console.debug({request});
         let endpoint = `${process.env.REACT_APP_FYP_SERVER_DOMAIN}/exercise/demo`;
@@ -142,6 +142,7 @@ const TheWholePage = ({exercise, animation}) => {
 
 const ExerciseCodingArea = ({code, setCode, iterations, setIterations, data, setData, demoCallback}) => {
 
+    const [constantData] = useState(data)
     const map = new Map();
     map.set('#iterations', (
         <Card.Body>
@@ -150,7 +151,7 @@ const ExerciseCodingArea = ({code, setCode, iterations, setIterations, data, set
     ));
 
     map.set('#data', (
-        <DataOptions data={data} setData={setData}/>
+        <DataOptions data={data} setData={setData} height={'500'}/>
     ));
 
     map.set('#editor', (
@@ -158,16 +159,7 @@ const ExerciseCodingArea = ({code, setCode, iterations, setIterations, data, set
     ));
 
     map.set('#demo', (
-        <Card.Body>
-            <Card.Text className={'d-flex justify-content-center'}>
-                Click on one of the algorithms below to run those
-                algorithms
-            </Card.Text>
-            <ButtonGroup className={'d-flex justify-content-center'}>
-                <Button variant="secondary" onClick={() => demoCallback('randomhillclimbing')}>Random Hill Climbing</Button>
-                <Button variant="secondary" onClick={() => demoCallback('simulatedannealing')}>Simulated Annealing</Button>
-            </ButtonGroup>
-        </Card.Body>
+        <ExerciseDemo demoCallback={demoCallback} data={constantData}/>
     ));
 
     const [selected, setSelected] = useState(map.get('#editor'));
@@ -180,9 +172,19 @@ const ExerciseCodingArea = ({code, setCode, iterations, setIterations, data, set
     );
 };
 
-const DataOptions = ({data, setData}) => {
+const DataOptions = ({data, setData, height}) => {
+    const [innerData, setInnerData] = useState(data);
+
+    useEffect(() => {
+        setData(innerData);
+    }, [innerData, setData]);
+
     return (
-        <MonacoDataEditor data={data} setData={setData} language={'json'}/>
+        <MonacoDataEditor
+            data={innerData}
+            setData={setInnerData}
+            language={'json'}
+            height={height}/>
     );
 };
 
@@ -312,7 +314,7 @@ const AnimationTab = ({solution, weights, animation, solutions}) => {
 
     return (
         <ShadowedCard>
-            <Card.Header as={'h5'}>Animation</Card.Header>
+            <Card.Header as={'h5'} className={'dark-blue-text'}>Animation</Card.Header>
             <Card.Body>
                 <Container style={{background: 'white', border: '1px solid', textAlign: 'center'}}>
                     {animation({solution, weights, solutions})}
@@ -342,4 +344,4 @@ const SubmitCodeButton = ({callback, isLoading}) => {
     );
 };
 
-export {ExercisePage, ShadowedCard};
+export {ExercisePage, ShadowedCard, IterationsOptions, DataOptions};

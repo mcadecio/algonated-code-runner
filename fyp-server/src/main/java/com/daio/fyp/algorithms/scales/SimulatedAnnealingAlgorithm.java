@@ -6,19 +6,22 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class SimulatedAnnealingAlgorithm implements Algorithm<Solution, List<Double>> {
 
     private static final Logger logger = LoggerFactory.getLogger(SimulatedAnnealingAlgorithm.class);
     private final UniformRandomGenerator randomGenerator = new UniformRandomGenerator();
     private final List<List<Integer>> solutions = new ArrayList<>();
+    private Optional<Double> optionalTemp = Optional.empty();
+    private Optional<Double> optionalCR = Optional.empty();
 
     @Override
     public Solution run(List<Double> weights, int iterations) {
         logger.info("Running SA");
 
-        double temperature = 1000;
-        double coolingRate = calcCR(temperature, iterations);
+        double temperature = optionalTemp.orElse(1000.0);
+        double coolingRate = optionalCR.orElse(calcCR(temperature, iterations));
 
         Solution finalSolution = new ScalesSolution(weights.size());
 
@@ -34,6 +37,17 @@ public class SimulatedAnnealingAlgorithm implements Algorithm<Solution, List<Dou
     @Override
     public List<List<Integer>> getSolutions() {
         return solutions;
+    }
+
+
+    public SimulatedAnnealingAlgorithm setOptionalTemp(double optionalTemp) {
+        this.optionalTemp = Optional.of(optionalTemp);
+        return this;
+    }
+
+    public SimulatedAnnealingAlgorithm setOptionalCR(double optionalCR) {
+        this.optionalCR = Optional.of(optionalCR);
+        return this;
     }
 
     private Solution calculateNewSolution(List<Double> weights, double temperature, Solution finalSolution) {

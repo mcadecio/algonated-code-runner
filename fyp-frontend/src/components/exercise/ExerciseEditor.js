@@ -1,11 +1,11 @@
 import React, {useState} from 'react';
 import MonacoEditor from 'react-monaco-editor';
 
-const MonacoDataEditor = ({data, setData, language}) => {
+const MonacoDataEditor = ({data, setData, language, height = "500"}) => {
     return (
         <div>
             <MonacoExerciseEditor
-                code={data} setCode={setData} language={language}/>
+                code={data} setCode={setData} language={language} height={height}/>
         </div>
     )
 }
@@ -42,12 +42,12 @@ const MyMonacoEditor = () => {
     );
 };
 
-const MonacoExerciseEditor = ({code, setCode, language}) => {
+const MonacoExerciseEditor = ({code, setCode, language, height = "500"}) => {
     return (
         <div>
             <MonacoEditor
                 width="auto"
-                height="500"
+                height={height}
                 theme="vs-light"
                 value={code}
                 language={language}

@@ -7,19 +7,22 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class SimulatedAnnealingAlgorithm implements Algorithm<TSPSolution, double[][]> {
 
     private static final Logger logger = LoggerFactory.getLogger(SimulatedAnnealingAlgorithm.class);
     private final UniformRandomGenerator randomGenerator = new UniformRandomGenerator();
     private final List<List<Integer>> solutions = new ArrayList<>();
+    private Optional<Double> optionalTemp = Optional.empty();
+    private Optional<Double> optionalCR = Optional.empty();
 
     @Override
     public TSPSolution run(double[][] distances, int iterations) {
         logger.info("Running SA");
 
-        double temperature = calculateTemp(distances);
-        double coolingRate = calcCR(temperature, iterations);
+        double temperature = optionalTemp.orElse(calculateTemp(distances));
+        double coolingRate = optionalCR.orElse(calcCR(temperature, iterations));
 
         TSPSolution finalSolution = new TSPSolution(distances.length);
 
@@ -36,6 +39,16 @@ public class SimulatedAnnealingAlgorithm implements Algorithm<TSPSolution, doubl
     @Override
     public List<List<Integer>> getSolutions() {
         return solutions;
+    }
+
+    public SimulatedAnnealingAlgorithm setOptionalTemp(double optionalTemp) {
+        this.optionalTemp = Optional.of(optionalTemp);
+        return this;
+    }
+
+    public SimulatedAnnealingAlgorithm setOptionalCR(double optionalCR) {
+        this.optionalCR = Optional.of(optionalCR);
+        return this;
     }
 
     private TSPSolution calculateNewSolution(double[][] distances, double temperature, TSPSolution finalSolution) {
