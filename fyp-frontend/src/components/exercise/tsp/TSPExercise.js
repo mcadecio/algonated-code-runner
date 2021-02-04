@@ -36,6 +36,8 @@ const TSPDescription = () => (
         <hr/>
         <TemplateDescription/>
         <hr/>
+        <Instructions/>
+        <hr/>
         <AdditionalDescription/>
     </div>
 );
@@ -43,6 +45,12 @@ const TSPDescription = () => (
 const JavaCode = ({code}) => (
     <Highlight language={'java'}>
         {code}
+    </Highlight>
+);
+
+const JsonCode = ({json}) => (
+    <Highlight language={'json'}>
+        {json}
     </Highlight>
 );
 
@@ -57,7 +65,7 @@ const ProblemBrief = () => (
         </Card.Text>
         <blockquote>
             <i>Given a list of cities and the distances between each pair
-            of cities, what is the shortest possible route that visits each city exactly once and returns
+                of cities, what is the shortest possible route that visits each city exactly once and returns
                 to the origin city?</i>
         </blockquote>
     </>
@@ -139,6 +147,28 @@ const TemplateDescription = () => (
         </Card.Text>
         <JavaCode code={config.exercise.defaultStarterCode}/>
     </>
+);
+
+const Instructions = () => (
+    <div>
+        <Card.Text>
+            <b>Instructions</b>
+            <br/>
+            - <i>Editor:</i> Use the editor to write your code.
+            <br/>
+            - <i>Iterations:</i> You can adjust the amount of iterations.
+            <br/>
+            - <i>Data:</i> In the Data tab, you can add your own data or modify the existing. Please make sure the data
+            is in json format and follows the following format:
+        </Card.Text>
+        <JsonCode json={`           {
+                "data": [...]
+           }`}/>
+        <Card.Text>
+            <br/>
+            - <i>Demo:</i> In the Demo tab, you can run run of the existing algorithms and see how they perform.
+        </Card.Text>
+    </div>
 );
 
 

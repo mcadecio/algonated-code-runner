@@ -27,9 +27,11 @@ const ScalesDescription = () => (
         <hr/>
         <ReturnDescription/>
         <hr/>
-        <AdditionalDescription/>
-        <hr/>
         <TemplateDescription/>
+        <hr/>
+        <Instructions/>
+        <hr/>
+        <AdditionalDescription/>
     </div>
 );
 
@@ -118,4 +120,34 @@ const TemplateDescription = () => (
         </Card.Text>
         <JavaCode code={config.exercise.defaultStarterCode}/>
     </>
+);
+
+
+const Instructions = () => (
+    <div>
+        <Card.Text>
+            <b>Instructions</b>
+            <br/>
+            - <i>Editor:</i> Use the editor to write your code.
+            <br/>
+            - <i>Iterations:</i> You can adjust the amount of iterations.
+            <br/>
+            - <i>Data:</i> In the Data tab, you can add your own data or modify the existing. Please make sure the data
+            is in json format and follows the following format:
+        </Card.Text>
+        <JsonCode json={`           {
+                "data": [...]
+           }`}/>
+        <Card.Text>
+            <br/>
+            - <i>Demo:</i> In the Demo tab, you can run run of the existing algorithms and see how they perform.
+        </Card.Text>
+
+    </div>
+);
+
+const JsonCode = ({json}) => (
+    <Highlight language={'json'}>
+        {json}
+    </Highlight>
 );
