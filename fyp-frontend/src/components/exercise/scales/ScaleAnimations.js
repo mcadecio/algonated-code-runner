@@ -145,7 +145,7 @@ const ScaleLabel = ({leftRectangleWidth, rightRectangleWidth}) => {
 
 const BalanceAnimation = ({solution, weights, solutions}) => {
     const [{left, right}, setLeftRight] = useState(SimpleWidthCalculator({solution, weights}));
-
+    const [fitness, setFitness] = useState(0)
     const updateLeftRight = (newLeft, newRight) => {
         setLeftRight({
             left: newLeft,
@@ -162,6 +162,7 @@ const BalanceAnimation = ({solution, weights, solutions}) => {
                 for (let i = 0; i < solutions.length; i++) {
                     let newWidth = SimpleWidthCalculator({solution: solutions[i], weights});
                     if (i > 0 && !equals(solutions[i - 1], solutions[i])) {
+                        setFitness(Math.abs(newWidth.left - newWidth.right))
                         updateLeftRight(newWidth.left, newWidth.right);
                     }
                     await delay(1);
@@ -171,16 +172,37 @@ const BalanceAnimation = ({solution, weights, solutions}) => {
 
             replay();
         }
-    }, [solutions, weights]);
+    }, [solutions, weights, setFitness]);
 
     return (
-        <BalanceScale
-            left={left}
-            right={right}
-            weights={weights.length}
-        />
+        <div>
+            <h5 className={'dark-blue-text'}>Fitness: {fitness}</h5>
+            <BalanceScale
+                left={left}
+                right={right}
+                weights={weights.length}
+            />
+        </div>
     );
 };
+
+const calculateFitness = (solution, weights) => {
+    let sumOfWeightsOnTheLeft = 0;
+    let sumOfWeightsOnTheRight = 0;
+
+    for (let i = 0; i < solution.length; i++) {
+        if (solution[i] === 0) {
+            sumOfWeightsOnTheLeft = sumOfWeightsOnTheLeft + weights[i];
+        } else {
+            sumOfWeightsOnTheRight = sumOfWeightsOnTheRight + weights[i];
+        }
+    }
+
+    return {
+        left: sumOfWeightsOnTheLeft,
+        right: sumOfWeightsOnTheRight
+    }
+}
 
 const equals = (solution, anotherSolution) => {
     let i = solution.length;
@@ -195,20 +217,11 @@ const SimpleWidthCalculator = ({solution, weights}) => {
     let left = randomStart;
     let right = Math.abs(randomStart - 1000);
 
-    let sumOfWeightsOnTheLeft = 0;
-    let sumOfWeightsOnTheRight = 0;
+    let sum = calculateFitness(solution, weights);
 
-    for (let i = 0; i < solution.length; i++) {
-        if (solution[i] === 0) {
-            sumOfWeightsOnTheLeft = sumOfWeightsOnTheLeft + weights[i];
-        } else {
-            sumOfWeightsOnTheRight = sumOfWeightsOnTheRight + weights[i];
-        }
-    }
-
-    if (sumOfWeightsOnTheRight !== 0 || sumOfWeightsOnTheLeft !== 0) {
-        left = sumOfWeightsOnTheLeft;
-        right = sumOfWeightsOnTheRight;
+    if (sum.left !== 0 || sum.right !== 0) {
+        left = sum.left;
+        right = sum.right;
     }
 
     return {left, right};

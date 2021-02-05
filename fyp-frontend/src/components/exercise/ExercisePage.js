@@ -316,7 +316,7 @@ const AnimationTab = ({solution, weights, animation, solutions}) => {
         <ShadowedCard>
             <Card.Header as={'h5'} className={'dark-blue-text'}>Animation</Card.Header>
             <Card.Body>
-                <Container style={{background: 'white', border: '1px solid', textAlign: 'center'}}>
+                <Container style={{background: 'white', textAlign: 'center'}}>
                     {animation({solution, weights, solutions})}
                 </Container>
             </Card.Body>

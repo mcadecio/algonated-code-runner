@@ -41,8 +41,11 @@ const FixedNetworkAnimation = ({solution, weights: distances, solutions}) => {
 
     return (
         <div>
-            <div>Fitness: {fitness}</div>
-            <Button variant={'light'} disabled={animationRunning}
+            <h5 className={'dark-blue-text'}>Fitness: {fitness}</h5>
+            <Button type='button'
+                    className={'btn-dark-blue'}
+                    variant={'primary'}
+                    disabled={animationRunning}
                     onClick={() => triggerLinkAnimation(solution, distances, setRunning, links, solutions, setFitness)}>
                 Run Animation
             </Button>
@@ -57,7 +60,7 @@ const calculateFitness = (solution, distances) => {
     let numberOfCities = solution.length;
 
     if (numberOfCities === 0) {
-        return -1;
+        return 0;
     }
 
     let sum = 0;
@@ -294,6 +297,7 @@ const triggerLinkAnimation = async (solution, distances, setRunning, links, solu
     links.reset();
     if (solution.length === distances.length && solution.length === distances[0].length) {
         if (solutions.length !== 0) {
+            setFitness(calculateFitness(solutions[0], distances));
             await createLinks(links.addLinks, solutions[0], distances);
             for (let i = 1; i < solutions.length; i++) {
                 let newLinks = [];

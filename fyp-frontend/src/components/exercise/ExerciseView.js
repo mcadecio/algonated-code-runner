@@ -40,7 +40,7 @@ const ExerciseCard = ({imgLocation, title, text, id}) => {
         <HoverableCard>
             <Card.Img variant="top" src={imgLocation} style={{height: '300px'}}/>
             <Card.Body>
-                <Card.Title>{title}</Card.Title>
+                <Card.Title as={'h5'}>{title}</Card.Title>
                 <Card.Text>{text}</Card.Text>
             </Card.Body>
             <Card.Footer>

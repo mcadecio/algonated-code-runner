@@ -69,8 +69,6 @@ public class SimulatedAnnealingAlgorithm implements Algorithm<TSPSolution, doubl
             finalSolution = temporarySolution.copy();
         }
 
-        logger.info("{}", finalSolution.calculateFitness(distances));
-
         return finalSolution;
     }
 

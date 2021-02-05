@@ -1,15 +1,13 @@
-package newer.scales;
+package old.scales;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class ScalesProblem {
-    private List<List<Integer>> solutions;
+    private List<String> solutions;
 
-    public List<Integer> runScales(List<Double> weights, int iterations) {
+    public String runScales(List<Double> weights, int iterations) {
 
         SimulatedAnnealingAlgorithm simulatedAnnealingAlgorithm = new SimulatedAnnealingAlgorithm();
         Solution solution = simulatedAnnealingAlgorithm
@@ -25,7 +23,7 @@ interface Solution {
 
     void makeSmallChange();
 
-    List<Integer> getSolution();
+    String getSolution();
 
     Solution copy();
 }
@@ -77,10 +75,8 @@ class ScalesSolution implements Solution {
     }
 
     @Override
-    public List<Integer> getSolution() {
-        return Stream.of(solution.split(""))
-                .map(Integer::parseInt)
-                .collect(Collectors.toList());
+    public String getSolution() {
+        return solution;
     }
 
     @Override
@@ -124,13 +120,13 @@ class UniformRandomGenerator {
 interface Algorithm<T> {
     T run(List<Double> weights, int iterations);
 
-    List<List<Integer>> getSolutions();
+    List<String> getSolutions();
 }
 
 class SimulatedAnnealingAlgorithm implements Algorithm<Solution> {
 
     private final UniformRandomGenerator randomGenerator = new UniformRandomGenerator();
-    private final List<List<Integer>> solutions = new ArrayList<>();
+    private final List<String> solutions = new ArrayList<>();
 
     @Override
     public Solution run(List<Double> weights, int iterations) {
@@ -152,7 +148,7 @@ class SimulatedAnnealingAlgorithm implements Algorithm<Solution> {
     }
 
     @Override
-    public List<List<Integer>> getSolutions() {
+    public List<String> getSolutions() {
         return solutions;
     }
 
@@ -195,7 +191,7 @@ class SimulatedAnnealingAlgorithm implements Algorithm<Solution> {
 
 class RandomHillClimbingAlgorithm implements Algorithm<Solution> {
 
-    private final List<List<Integer>> solutions = new ArrayList<>();
+    private final List<String> solutions = new ArrayList<>();
 
     @Override
     public Solution run(List<Double> weights, int iterations) {
@@ -227,7 +223,7 @@ class RandomHillClimbingAlgorithm implements Algorithm<Solution> {
     }
 
     @Override
-    public List<List<Integer>> getSolutions() {
+    public List<String> getSolutions() {
         return solutions;
     }
 

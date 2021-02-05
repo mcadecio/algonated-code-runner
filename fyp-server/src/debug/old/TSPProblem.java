@@ -1,4 +1,4 @@
-package newer.tsp;
+package old.tsp;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -219,4 +219,3 @@ class RandomHillClimbingAlgorithm {
     }
 
 }
-
