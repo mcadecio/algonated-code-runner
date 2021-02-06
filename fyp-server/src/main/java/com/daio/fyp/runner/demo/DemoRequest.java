@@ -8,6 +8,8 @@ public class DemoRequest<T> {
     private int iterations;
     private double temperature;
     private double coolingRate;
+    private int delta;
+    private int restarts;
 
     public String getProblem() {
         return problem;
@@ -60,6 +62,24 @@ public class DemoRequest<T> {
 
     public DemoRequest<T> setCoolingRate(double coolingRate) {
         this.coolingRate = coolingRate;
+        return this;
+    }
+
+    public int getDelta() {
+        return delta;
+    }
+
+    public DemoRequest<T> setDelta(int delta) {
+        this.delta = delta;
+        return this;
+    }
+
+    public int getRestarts() {
+        return restarts;
+    }
+
+    public DemoRequest<T> setRestarts(int restarts) {
+        this.restarts = restarts;
         return this;
     }
 }

@@ -9,10 +9,10 @@ public class ScalesProblem {
 
     public String runScales(List<Double> weights, int iterations) {
 
-        SimulatedAnnealingAlgorithm simulatedAnnealingAlgorithm = new SimulatedAnnealingAlgorithm();
-        Solution solution = simulatedAnnealingAlgorithm
+        Algorithm<Solution> algorithm = new SimulatedAnnealingAlgorithm();
+        Solution solution = algorithm
                 .run(weights, iterations);
-        solutions = simulatedAnnealingAlgorithm.getSolutions();
+        solutions = algorithm.getSolutions();
         return solution
                 .getSolution();
     }

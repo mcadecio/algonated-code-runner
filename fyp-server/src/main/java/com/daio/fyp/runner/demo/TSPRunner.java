@@ -1,8 +1,6 @@
 package com.daio.fyp.runner.demo;
 
 import com.daio.fyp.algorithms.scales.Algorithm;
-import com.daio.fyp.algorithms.tsp.RandomHillClimbingAlgorithm;
-import com.daio.fyp.algorithms.tsp.SimulatedAnnealingAlgorithm;
 import com.daio.fyp.algorithms.tsp.TSPSolution;
 import com.daio.fyp.response.Response;
 import com.daio.fyp.runner.CodeRunnerSummary;
@@ -26,14 +24,7 @@ public class TSPRunner {
     }
 
     public TSPRunner run() {
-        Algorithm<TSPSolution, double[][]> algorithm = new SimulatedAnnealingAlgorithm();
-        if (request.getAlgorithm().equals("simulatedannealing")) {
-            algorithm = new SimulatedAnnealingAlgorithm()
-                    .setOptionalCR(request.getCoolingRate())
-                    .setOptionalTemp(request.getTemperature());
-        } else if (request.getAlgorithm().equals("randomhillclimbing")) {
-            algorithm = new RandomHillClimbingAlgorithm();
-        }
+        Algorithm<TSPSolution, double[][]> algorithm = Algorithm.getTSPAlgorithm(request);
 
         Stopwatch timer = Stopwatch.createStarted();
         solution = algorithm.run(request.getData(), request.getIterations()).getSolution();

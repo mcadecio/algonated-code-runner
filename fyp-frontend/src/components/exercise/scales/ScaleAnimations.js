@@ -161,10 +161,10 @@ const BalanceAnimation = ({solution, weights, solutions}) => {
 
                 for (let i = 0; i < solutions.length; i++) {
                     let newWidth = SimpleWidthCalculator({solution: solutions[i], weights});
-                    if (i > 0 && !equals(solutions[i - 1], solutions[i])) {
+                    // if (i > 0 && !equals(solutions[i - 1], solutions[i])) {
                         setFitness(Math.abs(newWidth.left - newWidth.right))
                         updateLeftRight(newWidth.left, newWidth.right);
-                    }
+                    // }
                     await delay(1);
                 }
 
@@ -180,7 +180,7 @@ const BalanceAnimation = ({solution, weights, solutions}) => {
             <BalanceScale
                 left={left}
                 right={right}
-                weights={weights.length}
+                weights={weights.reduce((a, b) => a + b, 0)}
             />
         </div>
     );

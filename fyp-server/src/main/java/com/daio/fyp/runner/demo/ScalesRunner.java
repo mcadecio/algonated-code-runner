@@ -1,8 +1,6 @@
 package com.daio.fyp.runner.demo;
 
 import com.daio.fyp.algorithms.scales.Algorithm;
-import com.daio.fyp.algorithms.scales.RandomHillClimbingAlgorithm;
-import com.daio.fyp.algorithms.scales.SimulatedAnnealingAlgorithm;
 import com.daio.fyp.algorithms.scales.Solution;
 import com.daio.fyp.response.Response;
 import com.daio.fyp.runner.CodeRunnerSummary;
@@ -26,14 +24,7 @@ public class ScalesRunner {
     }
 
     public ScalesRunner run() {
-        Algorithm<Solution, List<Double>> algorithm = new SimulatedAnnealingAlgorithm();
-        if (request.getAlgorithm().equals("simulatedannealing")) {
-            algorithm = new SimulatedAnnealingAlgorithm()
-                    .setOptionalCR(request.getCoolingRate())
-                    .setOptionalTemp(request.getTemperature());
-        } else if (request.getAlgorithm().equals("randomhillclimbing")) {
-            algorithm = new RandomHillClimbingAlgorithm();
-        }
+        Algorithm<Solution, List<Double>> algorithm = Algorithm.getScalesAlgorithm(request);
 
         Stopwatch timer = Stopwatch.createStarted();
         solution = algorithm.run(request.getData(), request.getIterations()).getSolution();
