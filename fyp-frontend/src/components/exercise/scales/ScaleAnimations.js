@@ -145,7 +145,7 @@ const ScaleLabel = ({leftRectangleWidth, rightRectangleWidth}) => {
 
 const BalanceAnimation = ({solution, weights, solutions}) => {
     const [{left, right}, setLeftRight] = useState(SimpleWidthCalculator({solution, weights}));
-    const [fitness, setFitness] = useState(0)
+    const [fitness, setFitness] = useState(0);
     const updateLeftRight = (newLeft, newRight) => {
         setLeftRight({
             left: newLeft,
@@ -161,11 +161,11 @@ const BalanceAnimation = ({solution, weights, solutions}) => {
 
                 for (let i = 0; i < solutions.length; i++) {
                     let newWidth = SimpleWidthCalculator({solution: solutions[i], weights});
-                    // if (i > 0 && !equals(solutions[i - 1], solutions[i])) {
-                        setFitness(Math.abs(newWidth.left - newWidth.right))
+                    if (i > 0 && !equals(solutions[i - 1], solutions[i])) {
+                        setFitness(Math.abs(newWidth.left - newWidth.right));
                         updateLeftRight(newWidth.left, newWidth.right);
-                    // }
-                    await delay(1);
+                        await delay(1);
+                    }
                 }
 
             };
@@ -180,7 +180,7 @@ const BalanceAnimation = ({solution, weights, solutions}) => {
             <BalanceScale
                 left={left}
                 right={right}
-                weights={weights.reduce((a, b) => a + b, 0)}
+                weights={weights}
             />
         </div>
     );
@@ -201,8 +201,8 @@ const calculateFitness = (solution, weights) => {
     return {
         left: sumOfWeightsOnTheLeft,
         right: sumOfWeightsOnTheRight
-    }
-}
+    };
+};
 
 const equals = (solution, anotherSolution) => {
     let i = solution.length;
@@ -238,8 +238,9 @@ const BalanceScale = ({left, right, weights}) => {
 
         let offset = right - left;
 
-        let rotation = (offset * maxRotation) / weights;
-        let translation = (offset * maxYTranslation) / weights;
+        let weightsSum = weights.reduce((a, b) => a + b, 0)
+        let rotation = (offset * maxRotation) / (weightsSum);
+        let translation = (offset * maxYTranslation) / (weightsSum);
 
         if (rotation > maxRotation) {
             rotation = maxRotation;

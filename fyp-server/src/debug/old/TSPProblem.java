@@ -6,11 +6,22 @@ import java.util.List;
 import java.util.Random;
 
 public class TSPProblem {
+    private List<List<Integer>> solutions;
+
     public List<Integer> runTSP(double[][] distances, int iterations) {
-        return new SimulatedAnnealingAlgorithm()
-                .run(distances, iterations)
+        Algorithm algorithm = new SimulatedAnnealingAlgorithm();
+        TSPSolution solution = algorithm
+                .run(distances, iterations);
+        solutions = algorithm.getSolutions();
+        return solution
                 .getSolution();
     }
+}
+
+interface Algorithm {
+    TSPSolution run(double[][] distances, int iterations);
+
+    List<List<Integer>> getSolutions();
 }
 
 
@@ -111,9 +122,10 @@ class UniformRandomGenerator {
 }
 
 
-class SimulatedAnnealingAlgorithm {
+class SimulatedAnnealingAlgorithm implements Algorithm {
 
     private final UniformRandomGenerator randomGenerator = new UniformRandomGenerator();
+    private final List<List<Integer>> solutions = new ArrayList<>();
 
     public TSPSolution run(double[][] distances, int iterations) {
         System.out.println("Running SA");
@@ -125,11 +137,16 @@ class SimulatedAnnealingAlgorithm {
 
         for (int i = 0; i < iterations; i++) {
             finalSolution = calculateNewSolution(distances, temperature, finalSolution);
+            solutions.add(finalSolution.getSolution());
             temperature = coolingRate * temperature;
         }
 
 
         return finalSolution;
+    }
+
+    public List<List<Integer>> getSolutions() {
+        return solutions;
     }
 
     private TSPSolution calculateNewSolution(double[][] distances, double temperature, TSPSolution finalSolution) {
@@ -189,7 +206,9 @@ class SimulatedAnnealingAlgorithm {
 }
 
 
-class RandomHillClimbingAlgorithm {
+class RandomHillClimbingAlgorithm implements Algorithm {
+
+    private final List<List<Integer>> solutions = new ArrayList<>();
 
     public TSPSolution run(double[][] distances, int iterations) {
         System.out.println("Running RMHC");
@@ -209,13 +228,18 @@ class RandomHillClimbingAlgorithm {
 
             if (newFitness == 0) {
                 currentSolution = newSolution.copy();
+                solutions.add(currentSolution.getSolution());
                 break;
             }
 
-
+            solutions.add(currentSolution.getSolution());
         }
 
         return currentSolution;
+    }
+
+    public List<List<Integer>> getSolutions() {
+        return solutions;
     }
 
 }

@@ -56,7 +56,7 @@ public class StochasticHillClimbing implements Algorithm<Solution, List<Double>>
     }
 
     private double acceptanceProbability(double newFitness, double oldFitness, double stud) {
-        double fitnessDifference = newFitness - oldFitness;
+        double fitnessDifference = oldFitness - newFitness;
         double fitnessExponent = 1 + Math.exp(fitnessDifference / stud);
         return 1.0 / fitnessExponent;
     }

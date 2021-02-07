@@ -12,7 +12,7 @@
     "className": "ScalesProblem",
     "packageName": "com.exercise",
     "methodToCall": "runScales",
-    "iterations": 250000,
+    "iterations": 10000,
     "defaultStarterCode": "import java.util.ArrayList;\nimport java.util.List;\n\npublic class ScalesProblem {\n    private List<String> solutions = new ArrayList<>();\n\n    public String runScales(List<Double> weights, int iterations) {\n        return \"\";\n    }\n\n}",
     "importsAllowed": [
       "import java.util.List;",

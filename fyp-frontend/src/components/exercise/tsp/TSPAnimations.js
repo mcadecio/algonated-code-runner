@@ -298,7 +298,7 @@ const triggerLinkAnimation = async (solution, distances, setRunning, links, solu
     if (solution.length === distances.length && solution.length === distances[0].length) {
         if (solutions.length !== 0) {
             setFitness(calculateFitness(solutions[0], distances));
-            await createLinks(links.addLinks, solutions[0], distances);
+            await createLinks(links.addLinks, solutions[0], distances, 100);
             for (let i = 1; i < solutions.length; i++) {
                 let newLinks = [];
                 const addLinks = (city, nextCity, distance) => {
@@ -309,7 +309,7 @@ const triggerLinkAnimation = async (solution, distances, setRunning, links, solu
                     });
                 };
                 if (!equals(solutions[i - 1], solutions[i])) {
-                    await createLinks(addLinks, solutions[i], distances, 0);
+                    await createLinks(addLinks, solutions[i], distances, 0.1);
                     setFitness(calculateFitness(solutions[i], distances));
                     links.replace(newLinks);
                 }
