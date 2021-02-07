@@ -52,27 +52,7 @@ const TheWholePage = ({exercise, animation}) => {
             ...extraFields
         };
         console.debug({request});
-        let endpoint = `${process.env.REACT_APP_FYP_SERVER_DOMAIN}/exercise/demo`;
-
-        if (process.env.NODE_ENV === 'development') {
-            console.debug(process.env.NODE_ENV);
-            endpoint = `http://localhost:80/exercise/demo`;
-        }
-        fetch(endpoint, {
-            method: 'POST',
-            body: JSON.stringify(request),
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        }).then(res => {
-            return res.json();
-        }).then(requestResult => {
-            console.debug(requestResult);
-            setConsoleOutput(requestResult);
-            alert.setShow(!requestResult.isSuccess);
-        }).finally(() => {
-            setLoading(false);
-        });
+        fetchRequest("/exercise/demo", request);
     };
 
     const sendCodeToServer = (value) => {
@@ -84,13 +64,15 @@ const TheWholePage = ({exercise, animation}) => {
             iterations: Number.parseInt(iterations, 10)
         };
         console.debug({request});
-        let endpoint = `${process.env.REACT_APP_FYP_SERVER_DOMAIN}${exercise.endpoint}`;
 
-        if (process.env.NODE_ENV === 'development') {
-            console.debug(process.env.NODE_ENV);
-            endpoint = `http://localhost:80${exercise.endpoint}`;
-        }
-        fetch(endpoint, {
+        fetchRequest(exercise.endpoint, request);
+    };
+
+    const fetchRequest = (endpoint, request) => {
+
+        let url = `${process.env.REACT_APP_FYP_SERVER_DOMAIN}${endpoint}`;
+
+        fetch(url, {
             method: 'POST',
             body: JSON.stringify(request),
             headers: {
@@ -105,7 +87,7 @@ const TheWholePage = ({exercise, animation}) => {
         }).finally(() => {
             setLoading(false);
         });
-    };
+    }
 
     return (
         <>
