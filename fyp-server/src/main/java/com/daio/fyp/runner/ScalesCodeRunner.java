@@ -1,6 +1,5 @@
 package com.daio.fyp.runner;
 
-import com.daio.fyp.Timer;
 import com.daio.fyp.response.Response;
 import com.daio.fyp.runner.calculator.ScalesEfficiencyCalculator;
 import com.daio.fyp.runner.calculator.ScalesFitnessCalculator;
@@ -75,20 +74,19 @@ public class ScalesCodeRunner {
 
             List<String> stringSolutions = compiledClass.get("solutions");
 
-            Timer.runTimedTaskWithException(
-                    () -> solutions = binaryStringToList(stringSolutions),
-                    "getSolutions"
-            );
+            solutions = binaryStringToList(stringSolutions);
 
             solution = transformStringToList(rawSolution);
             isSuccess = true;
             errorMessage = "Compile and Run was a success!";
             buildSummary(timer.elapsed(TimeUnit.MILLISECONDS));
-            return this;
-        } catch (ReflectException reflectException) {
-            handleError(reflectException.getMessage());
-            return this;
+        } catch (ReflectException | ExecutionException exception) {
+            handleError(exception.getMessage());
+        } catch (InterruptedException interruptedException) {
+            handleError(interruptedException.getMessage());
+            Thread.currentThread().interrupt();
         }
+        return this;
     }
 
     public void buildSummary(long elapsed) {

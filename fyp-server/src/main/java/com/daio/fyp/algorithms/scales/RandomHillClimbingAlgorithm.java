@@ -16,6 +16,7 @@ public class RandomHillClimbingAlgorithm implements Algorithm<Solution, List<Dou
         logger.info("Running RMHC");
 
         Solution currentSolution = new ScalesSolution(weights.size());
+        solutions.add(currentSolution.getSolution());
 
         for (int i = 0; i < iterations; i++) {
             Solution newSolution = currentSolution.copy();
@@ -27,14 +28,13 @@ public class RandomHillClimbingAlgorithm implements Algorithm<Solution, List<Dou
             if (newFitness < currentFitness) {
                 currentSolution = newSolution.copy();
             }
+            solutions.add(currentSolution.getSolution());
 
             if (newFitness == 0) {
                 currentSolution = newSolution.copy();
-                solutions.add(currentSolution.getSolution());
                 break;
             }
 
-            solutions.add(currentSolution.getSolution());
         }
 
         return currentSolution;

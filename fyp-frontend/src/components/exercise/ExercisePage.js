@@ -52,7 +52,7 @@ const TheWholePage = ({exercise, animation}) => {
             ...extraFields
         };
         console.debug({request});
-        fetchRequest("/exercise/demo", request);
+        fetchRequest('/exercise/demo', request);
     };
 
     const sendCodeToServer = (value) => {
@@ -87,7 +87,7 @@ const TheWholePage = ({exercise, animation}) => {
         }).finally(() => {
             setLoading(false);
         });
-    }
+    };
 
     return (
         <>
@@ -124,32 +124,34 @@ const TheWholePage = ({exercise, animation}) => {
 
 const ExerciseCodingArea = ({code, setCode, iterations, setIterations, data, setData, demoCallback}) => {
 
-    const [constantData] = useState(data)
-    const map = new Map();
-    map.set('#iterations', (
-        <Card.Body>
-            <IterationsOptions iterations={iterations} setIterations={setIterations}/>
-        </Card.Body>
-    ));
+    const [constantData] = useState(data);
+    const [selected, setSelected] = useState('#editor');
+    const tabs = [{
+        href: '#editor',
+        title: 'Editor'
+    }, {
+        href: '#demo',
+        title: 'Demo'
+    }];
 
-    map.set('#data', (
-        <DataOptions data={data} setData={setData} height={'500'}/>
-    ));
-
-    map.set('#editor', (
-        <MonacoExerciseEditor code={code} setCode={setCode} language={'java'}/>
-    ));
-
-    map.set('#demo', (
-        <ExerciseDemo demoCallback={demoCallback} data={constantData}/>
-    ));
-
-    const [selected, setSelected] = useState(map.get('#editor'));
+    const selectTab = (selection) => {
+        if (selection === '#demo') {
+            return <ExerciseDemo demoCallback={demoCallback} data={constantData}/>
+        }
+        if (selection === '#editor') {
+            return <EditorWithTabs code={code}
+                                   setCode={setCode}
+                                   data={data}
+                                   setData={setData}
+                                   iterations={iterations}
+                                   setIterations={setIterations}/>
+        }
+    };
 
     return (
         <ShadowedCard>
-            <CodingTabs changeTab={(selectedTab) => setSelected(map.get(selectedTab))}/>
-            {selected}
+            <HeaderTabs changeTab={setSelected} tabNames={tabs}/>
+            {selectTab(selected)}
         </ShadowedCard>
     );
 };
@@ -170,28 +172,74 @@ const DataOptions = ({data, setData, height}) => {
     );
 };
 
-const CodingTabs = ({changeTab}) => {
+const HeaderTabs = ({changeTab, tabNames}) => {
     return (
         <Card.Header as={'h5'}>
-            <Nav
-                onSelect={(selectedKey) => changeTab(selectedKey)}
-                fill={true}
-                variant="tabs"
-                defaultActiveKey={'#editor'}>
-                <Nav.Item>
-                    <Nav.Link href="#editor">Editor</Nav.Link>
-                </Nav.Item>
-                <Nav.Item>
-                    <Nav.Link href="#iterations">Iterations</Nav.Link>
-                </Nav.Item>
-                <Nav.Item>
-                    <Nav.Link href="#data">Data</Nav.Link>
-                </Nav.Item>
-                <Nav.Item>
-                    <Nav.Link href="#demo">Demo</Nav.Link>
-                </Nav.Item>
-            </Nav>
+            <TabNavigation changeTab={changeTab}
+                           tabNames={tabNames}/>
         </Card.Header>
+    );
+};
+
+const FooterTabs = ({changeTab, tabNames}) => {
+    return (
+        <Card.Footer as={'b'}>
+            <TabNavigation changeTab={changeTab}
+                           tabNames={tabNames}/>
+        </Card.Footer>
+    );
+};
+
+const EditorWithTabs = ({data, iterations, setIterations, setData, code, setCode}) => {
+    const tabs = [{
+        href: '#editor',
+        title: 'Editor'
+    }, {
+        href: '#iterations',
+        title: 'Iterations'
+    }, {
+        href: '#data',
+        title: 'Data'
+    }];
+
+    const [selected, setSelected] = useState('#editor');
+    const selectTab = (selection) => {
+        if (selection === '#iterations') {
+            return <Card.Body>
+                <IterationsOptions iterations={iterations} setIterations={setIterations}/>
+            </Card.Body>;
+        }
+        if (selection === '#editor') {
+            return <MonacoExerciseEditor code={code} setCode={setCode} language={'java'}/>;
+        }
+        if (selection === '#data') {
+            return <DataOptions data={data} setData={setData} height={'500'}/>;
+        }
+    };
+    return (
+        <>
+            {selectTab(selected)}
+            <FooterTabs changeTab={setSelected} tabNames={tabs}/>
+        </>
+    );
+
+};
+
+const TabNavigation = ({changeTab, tabNames}) => {
+    return (
+        <Nav
+            onSelect={(selectedKey) => changeTab(selectedKey)}
+            fill={true}
+            variant="tabs"
+            defaultActiveKey={tabNames[0].href}>
+            {tabNames.map(tabName => {
+                return (
+                    <Nav.Item key={tabName.href}>
+                        <Nav.Link href={tabName.href}>{tabName.title}</Nav.Link>
+                    </Nav.Item>
+                );
+            })}
+        </Nav>
     );
 };
 
