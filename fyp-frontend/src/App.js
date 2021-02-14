@@ -10,6 +10,7 @@ import Navbar from 'react-bootstrap/Navbar';
 import Nav from 'react-bootstrap/Nav';
 import ExerciseView from './components/exercise/ExerciseView';
 import ReactPlayer from 'react-player/file';
+import Spinner from 'react-bootstrap/Spinner';
 
 function App() {
 
@@ -26,6 +27,14 @@ function App() {
                         <Route exact path='/exercises' component={ExerciseView}/>
                         <Route exact path="/exercises/scales" component={ScalesExercise}/>
                         <Route exact path="/exercises/tsp" component={TSPExercise}/>
+                        <Route exact path='/feedback' component={() => {
+                            window.location.href = 'https://docs.google.com/forms/d/1LnA9jmOu3EMRR66y2i5SLDGrD7BR6uKNzbAOP1845w4';
+                            return (<div>
+                                <span>Redirecting...</span>
+                                {' '}
+                                <Spinner animation="border" role="status"/>
+                            </div>);
+                        }}/>
                         <Route path="*" component={NotFound}/>
                     </Switch>
                 </div>
@@ -40,6 +49,7 @@ const MainNavBar = () => (
             <Navbar.Brand>Algorithms Animated</Navbar.Brand>
             <Nav className="mr-auto">
                 <Nav.Link as={Link} to={'/exercises'}>Exercises</Nav.Link>
+                <Nav.Link as={Link} to={'/feedback'}>Feedback</Nav.Link>
             </Nav>
             <AuthNav/>
         </Navbar>
