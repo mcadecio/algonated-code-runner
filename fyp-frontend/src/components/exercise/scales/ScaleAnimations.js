@@ -213,9 +213,9 @@ const equals = (solution, anotherSolution) => {
 };
 
 const SimpleWidthCalculator = ({solution, weights}) => {
-    const randomStart = Math.floor(Math.random() * Math.floor(1000));
+    const randomStart = Math.floor(Math.random() * Math.floor(3682913));
     let left = randomStart;
-    let right = Math.abs(randomStart - 1000);
+    let right = Math.abs(randomStart - 3682913);
 
     let sum = calculateFitness(solution, weights);
 
