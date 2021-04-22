@@ -10,10 +10,7 @@ import com.daio.fyp.runner.demo.ScalesRunner;
 import com.daio.fyp.runner.demo.TSPRunner;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
-import io.vertx.core.AbstractVerticle;
-import io.vertx.core.Handler;
-import io.vertx.core.Promise;
-import io.vertx.core.Vertx;
+import io.vertx.core.*;
 import io.vertx.core.http.HttpServer;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
@@ -48,20 +45,18 @@ public class Server extends AbstractVerticle {
 
         router.get("/hello").handler(rc -> rc.response().end("Hello, World!"));
 
-        router.post("/exercise/submit/").handler(rc -> {
+        router.postWithRegex("/exercise/.*").handler(rc -> {
             final String prettyRequest = rc.getBodyAsJson().encodePrettily();
-            logger.info("This was the code submitted -> \n{}", prettyRequest);
+            logger.info("This was the request submitted -> \n{}", prettyRequest);
             rc.next();
         });
 
         router.post("/exercise/submit/scales")
                 .handler(rc -> executeBlocking(() -> handleScalesRequest(rc), rc));
-
-        router.post("/exercise/demo")
-                .handler(rc -> executeBlocking(() -> handleDemoRequest(rc), rc));
-
         router.post("/exercise/submit/tsp")
                 .handler(rc -> executeBlocking(() -> handleTSPRequest(rc), rc));
+        router.post("/exercise/demo")
+                .handler(rc -> executeBlocking(() -> handleDemoRequest(rc), rc));
 
         httpServer = vertx.createHttpServer();
         httpServer

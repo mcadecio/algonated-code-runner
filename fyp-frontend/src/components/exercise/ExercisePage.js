@@ -263,7 +263,7 @@ const IterationsOptions = ({iterations, setIterations}) => {
 const IterationsSlider = ({value, setValue}) => {
     return (
         <div className="line controls">
-            <input className="progress" type="range" min="1" max="500000" value={value}
+            <input className="progress" type="range" min="1" max="20000" value={value}
                    style={{width: '50%'}}
                    onChange={(event) => {
                        setValue(event.target.value);

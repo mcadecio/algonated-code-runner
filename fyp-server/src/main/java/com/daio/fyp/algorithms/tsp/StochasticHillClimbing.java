@@ -29,7 +29,7 @@ public class StochasticHillClimbing implements Algorithm<TSPSolution, double[][]
 
             double acceptanceProbability = acceptanceProbability(newFitness, currentFitness, delta);
 
-            if (randomGenerator.generateInteger(0, 1) > acceptanceProbability) {
+            if (randomGenerator.generateDouble(0, 1) > acceptanceProbability) {
                 currentSolution = newSolution.copy();
             }
 

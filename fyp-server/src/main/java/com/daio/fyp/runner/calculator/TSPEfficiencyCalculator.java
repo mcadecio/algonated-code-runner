@@ -19,7 +19,6 @@ public class TSPEfficiencyCalculator implements Calculator<double[][]> {
                     .map(Integer::parseInt)
                     .collect(Collectors.toList());
         } catch (IOException e) {
-            e.printStackTrace();
             return -1;
         }
 
