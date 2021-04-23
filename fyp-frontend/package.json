@@ -22,7 +22,7 @@
     "web-vitals": "^0.2.4"
   },
   "scripts": {
-    "start": "REACT_APP_FYP_SERVER_DOMAIN=http://localhost:80 react-app-rewired start",
+    "start": "REACT_APP_FYP_SERVER_DOMAIN=http://localhost:3001 react-app-rewired start",
     "build": "react-app-rewired build",
     "test": "react-app-rewired test",
     "eject": "react-app-rewired eject"
