@@ -83,7 +83,7 @@ public class Server extends AbstractVerticle {
     }
 
     private int getPort() {
-        String port = System.getProperty("heroku.port", "80");
+        String port = System.getProperty("heroku.port", "3001");
         logger.info(port);
         return Integer.parseInt(port);
     }
