@@ -1,0 +1,10 @@
+{
+  "services": {
+    "scales-service": {
+      "server": {
+        "port": 80,
+        "host": "algonated-scales-service.herokuapp.com"
+      }
+    }
+  }
+}

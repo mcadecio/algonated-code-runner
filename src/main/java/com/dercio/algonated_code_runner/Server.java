@@ -1,5 +1,6 @@
 package com.dercio.algonated_code_runner;
 
+import com.dercio.algonated_code_runner.config.Config;
 import com.dercio.algonated_code_runner.response.Response;
 import com.dercio.algonated_code_runner.runner.CodeOptions;
 import com.dercio.algonated_code_runner.runner.CodeRunnerSummary;
@@ -10,12 +11,16 @@ import com.dercio.algonated_code_runner.runner.demo.ScalesRunner;
 import com.dercio.algonated_code_runner.runner.demo.TSPRunner;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
-import io.vertx.core.*;
+import io.vertx.core.AbstractVerticle;
+import io.vertx.core.Handler;
+import io.vertx.core.Promise;
+import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpServer;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.BodyHandler;
 import io.vertx.ext.web.handler.CorsHandler;
+import io.vertx.httpproxy.HttpProxy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,6 +33,7 @@ public class Server extends AbstractVerticle {
 
     private final Gson gson = new Gson();
     private final ObjectMapper mapper = new ObjectMapper();
+    private final Config config = new Config();
 
     private HttpServer httpServer;
 
@@ -39,7 +45,7 @@ public class Server extends AbstractVerticle {
         router.route().handler(createCorsHandler());
         router.route().failureHandler(this::handleFailure);
         router.get().handler(rc -> {
-            logger.info("Receiving request on path -> {}", rc.normalisedPath());
+            logger.info("Receiving request on path -> {}", rc.normalizedPath());
             rc.next();
         });
 
@@ -55,16 +61,35 @@ public class Server extends AbstractVerticle {
                 .handler(rc -> executeBlocking(() -> handleScalesRequest(rc), rc));
         router.post("/exercise/submit/tsp")
                 .handler(rc -> executeBlocking(() -> handleTSPRequest(rc), rc));
-        router.post("/exercise/demo")
+        router.postWithRegex("/exercise/demo/(tsp|scales)")
                 .handler(rc -> executeBlocking(() -> handleDemoRequest(rc), rc));
+
+        var scalesProxy = createScalesServiceProxy();
 
         httpServer = vertx.createHttpServer();
         httpServer
-                .requestHandler(router)
+                .requestHandler(req -> {
+                    if (req.path().contains("scales")) {
+                        logger.info("Proxying request to scales-service");
+                        scalesProxy.handle(req);
+                    } else {
+                        router.handle(req);
+                    }
+                })
                 .listen(getPort(), "0.0.0.0", result -> {
                     logger.info("HTTP Server Started ...");
                     startPromise.complete();
                 });
+    }
+
+    private HttpProxy createScalesServiceProxy() {
+        var scalesServerConfig = config.getScalesServiceConfig()
+                .getJsonObject("server");
+        return HttpProxy.reverseProxy(vertx.createHttpClient())
+                .origin(
+                        scalesServerConfig.getInteger("port", 80),
+                        scalesServerConfig.getString("host", "localhost")
+                );
     }
 
     private void handleFailure(RoutingContext rc) {
