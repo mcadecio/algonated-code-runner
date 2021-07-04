@@ -5,6 +5,12 @@
         "port": 80,
         "host": "algonated-scales-service.herokuapp.com"
       }
+    },
+    "tsp-service": {
+      "server": {
+        "port": 80,
+        "host": "algonated-tsp-service.herokuapp.com"
+      }
     }
   }
 }

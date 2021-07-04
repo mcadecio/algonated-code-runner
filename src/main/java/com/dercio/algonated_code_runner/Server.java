@@ -16,6 +16,7 @@ import io.vertx.core.Handler;
 import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpServer;
+import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.BodyHandler;
@@ -65,6 +66,7 @@ public class Server extends AbstractVerticle {
                 .handler(rc -> executeBlocking(() -> handleDemoRequest(rc), rc));
 
         var scalesProxy = createScalesServiceProxy();
+        var tspProxy = createTSPServiceProxy();
 
         httpServer = vertx.createHttpServer();
         httpServer
@@ -72,6 +74,9 @@ public class Server extends AbstractVerticle {
                     if (req.path().contains("scales")) {
                         logger.info("Proxying request to scales-service");
                         scalesProxy.handle(req);
+                    } else if (req.path().contains("tsp")) {
+                        logger.info("Proxying request to tsp-service");
+                        tspProxy.handle(req);
                     } else {
                         router.handle(req);
                     }
@@ -83,12 +88,24 @@ public class Server extends AbstractVerticle {
     }
 
     private HttpProxy createScalesServiceProxy() {
-        var scalesServerConfig = config.getScalesServiceConfig()
-                .getJsonObject("server");
+        return createReversedProxy(
+                config.getScalesServiceConfig()
+                        .getJsonObject("server")
+        );
+    }
+
+    private HttpProxy createTSPServiceProxy() {
+        return createReversedProxy(
+                config.getTSPServiceConfig()
+                        .getJsonObject("server")
+        );
+    }
+
+    private HttpProxy createReversedProxy(JsonObject originConfig) {
         return HttpProxy.reverseProxy(vertx.createHttpClient())
                 .origin(
-                        scalesServerConfig.getInteger("port", 80),
-                        scalesServerConfig.getString("host", "localhost")
+                        originConfig.getInteger("port", 80),
+                        originConfig.getString("host", "localhost")
                 );
     }
 
@@ -124,8 +141,6 @@ public class Server extends AbstractVerticle {
                 .allowedMethod(io.vertx.core.http.HttpMethod.GET)
                 .allowedMethod(io.vertx.core.http.HttpMethod.POST)
                 .allowedMethod(io.vertx.core.http.HttpMethod.OPTIONS)
-//                .allowCredentials(true)
-//                .allowedHeader("Authorization")
                 .allowedHeader("Access-Control-Request-Method")
                 .allowedHeader("Access-Control-Allow-Credentials")
                 .allowedHeader("Access-Control-Allow-Origin")

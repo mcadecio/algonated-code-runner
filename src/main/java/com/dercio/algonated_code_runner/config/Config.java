@@ -22,6 +22,10 @@ public class Config {
         return getServices().getJsonObject("scales-service");
     }
 
+    public JsonObject getTSPServiceConfig() {
+        return getServices().getJsonObject("tsp-service");
+    }
+
     public JsonObject getServices() {
         return jsonObject.getJsonObject("services");
     }
