@@ -78,7 +78,9 @@ public class Server extends AbstractVerticle {
                         logger.info("Proxying request to tsp-service");
                         tspProxy.handle(req);
                     } else {
-                        router.handle(req);
+                        req.response()
+                                .setStatusCode(404)
+                                .end();
                     }
                 })
                 .listen(getPort(), "0.0.0.0", result -> {
