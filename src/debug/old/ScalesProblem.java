@@ -1,14 +1,12 @@
-package old.scales;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 public class ScalesProblem {
-    private List<String> solutions;
 
-    public String runScales(List<Double> weights, int iterations) {
+    private List<List<Integer>> solutions;
 
+    public List<Integer> runScales(List<Double> weights, int iterations) {
         Algorithm<Solution> algorithm = new SimulatedAnnealingAlgorithm();
         Solution solution = algorithm
                 .run(weights, iterations);
@@ -23,32 +21,32 @@ interface Solution {
 
     void makeSmallChange();
 
-    String getSolution();
+    List<Integer> getSolution();
 
     Solution copy();
 }
 
 class ScalesSolution implements Solution {
     private static final UniformRandomGenerator randomGenerator = new UniformRandomGenerator();
-    private String solution;
+    private final List<Integer> solution;
 
     public ScalesSolution(int length) {
-        this(generateRandomBinaryString(length));
+        this(generateRandomBinaryList(length));
     }
 
-    private ScalesSolution(String solution) {
+    private ScalesSolution(List<Integer> solution) {
         this.solution = solution;
     }
 
     @Override
     public double calculateFitness(List<Double> weights) {
-        if (solution.length() > weights.size()) return (-1);
+        if (solution.size() > weights.size()) return (-1);
         double leftHandSide = 0.0;
         double rightHandSide = 0.0;
-        int n = solution.length();
+        int n = solution.size();
 
         for (int i = 0; i < n; i++) {
-            if (solution.charAt(i) == '0') {
+            if (solution.get(i) == 0) {
                 leftHandSide += weights.get(i);
             } else
                 rightHandSide += weights.get(i);
@@ -59,43 +57,40 @@ class ScalesSolution implements Solution {
 
     @Override
     public void makeSmallChange() {
-        int length = solution.length();
+        int length = solution.size();
 
         int randomInt = randomGenerator.generateInteger(0, length - 1);
-        char targetChar = solution.charAt(randomInt);
-        StringBuilder strBuilder = new StringBuilder(solution);
-
-        if (targetChar == '1') {
-            strBuilder.replace(randomInt, randomInt + 1, "0");
+        int targetChar = solution.get(randomInt);
+        if (targetChar == 1) {
+            solution.set(randomInt, 0);
         } else {
-            strBuilder.replace(randomInt, randomInt + 1, "1");
+            solution.set(randomInt, 1);
         }
 
-        solution = strBuilder.toString();
     }
 
     @Override
-    public String getSolution() {
+    public List<Integer> getSolution() {
         return solution;
     }
 
     @Override
     public ScalesSolution copy() {
-        return new ScalesSolution(this.solution);
+        return new ScalesSolution(new ArrayList<>(this.solution));
     }
 
-    private static String generateRandomBinaryString(int n) {
-        String s = "";
+    private static List<Integer> generateRandomBinaryList(int n) {
+        List<Integer> s = new ArrayList<>();
         for (int i = 0; i < n; i++) {
-            String randomChar = String.valueOf(randomGenerator.generateInteger(0, 1));
-            if (randomChar.equals("0")) {
-                s = s.concat(randomChar);
+            int randomChar = randomGenerator.generateInteger(0, 1);
+            if (randomChar == 0) {
+                s.add(randomChar);
             } else {
-                s = randomChar.concat(s);
+                s.add(0, randomChar);
             }
         }
 
-        return (s);
+        return s;
     }
 }
 
@@ -120,13 +115,13 @@ class UniformRandomGenerator {
 interface Algorithm<T> {
     T run(List<Double> weights, int iterations);
 
-    List<String> getSolutions();
+    List<List<Integer>> getSolutions();
 }
 
 class SimulatedAnnealingAlgorithm implements Algorithm<Solution> {
 
     private final UniformRandomGenerator randomGenerator = new UniformRandomGenerator();
-    private final List<String> solutions = new ArrayList<>();
+    private final List<List<Integer>> solutions = new ArrayList<>();
 
     @Override
     public Solution run(List<Double> weights, int iterations) {
@@ -148,7 +143,7 @@ class SimulatedAnnealingAlgorithm implements Algorithm<Solution> {
     }
 
     @Override
-    public List<String> getSolutions() {
+    public List<List<Integer>> getSolutions() {
         return solutions;
     }
 
@@ -191,7 +186,7 @@ class SimulatedAnnealingAlgorithm implements Algorithm<Solution> {
 
 class RandomHillClimbingAlgorithm implements Algorithm<Solution> {
 
-    private final List<String> solutions = new ArrayList<>();
+    private final List<List<Integer>> solutions = new ArrayList<>();
 
     @Override
     public Solution run(List<Double> weights, int iterations) {
@@ -223,7 +218,7 @@ class RandomHillClimbingAlgorithm implements Algorithm<Solution> {
     }
 
     @Override
-    public List<String> getSolutions() {
+    public List<List<Integer>> getSolutions() {
         return solutions;
     }
 
